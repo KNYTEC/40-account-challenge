@@ -11,7 +11,7 @@ import StatsPage from './pages/StatsPage.jsx'
 import StakePage from './pages/StakePage.jsx'
 
 const TITLES = {
-  '/': 'Live Status',
+  '/': '$60K in 30 Days',
   '/calendar': 'Daily P&L Calendar',
   '/stats': 'Full Stats & Charts',
   '/stake': 'The Stake',

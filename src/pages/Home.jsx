@@ -27,7 +27,8 @@ export default function Home({ stats, milestones, callout, config }) {
         <p className="eyebrow">
           Day {stats.daysTraded} · Status: {status.word} {status.emoji}
         </p>
-        <h1 className="mega-figure">{signedMoney(cumTotal)}</h1>
+        <h1 className="hero-title">{config.tagline}</h1>
+        <p className="mega-figure">{signedMoney(cumTotal)}</p>
         <p className="hero-sub">
           Total P&L across all {config.accounts} accounts
           {latest && (

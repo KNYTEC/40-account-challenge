@@ -736,6 +736,19 @@ body {
   margin: 0 0 12px;
 }
 
+.hero-title {
+  font-size: clamp(26px, 4.5vw, 42px);
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  margin: 0 0 6px;
+  background: linear-gradient(100deg, var(--accent), var(--good));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--accent);
+}
+
 .mega-figure {
   font-size: clamp(54px, 10vw, 96px);
   font-weight: 750;

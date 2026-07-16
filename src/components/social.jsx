@@ -38,7 +38,7 @@ export function SocialCards({ socials }) {
         </span>
         <span>
           <span className="sc-name">YouTube</span>
-          <span className="sc-desc">Daily trade recaps, every lockout on camera</span>
+          <span className="sc-desc">The "$60K in 30 Days" series — every lockout on camera</span>
         </span>
         <span className="sc-arrow" aria-hidden="true">→</span>
       </a>
