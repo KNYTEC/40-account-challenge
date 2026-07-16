@@ -136,6 +136,10 @@ export default function StakePage({ stats, config }) {
                 <span className="rv">~{pct(rules.assumedWinRate)}</span>
               </li>
               <li>
+                <span className="rk">Copy trading</span>
+                <span className="rv">{config.copyTrader} · all {accounts} accounts</span>
+              </li>
+              <li>
                 <span className="rk">Data source</span>
                 <span className="rv">Manual daily entry</span>
               </li>

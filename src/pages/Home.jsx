@@ -190,8 +190,8 @@ export default function Home({ stats, milestones, callout, config }) {
             <p className="rule-emoji">📋</p>
             <p className="rule-title">One plan × {config.accounts}</p>
             <p className="rule-copy">
-              Same setups, same entries, copied to every account. Roughly {Math.round(config.rules.assumedWinRate * 100)}%
-              of days end green — the math does the rest.
+              Same setups, same entries, mirrored to every account via {config.copyTrader}. Roughly{' '}
+              {Math.round(config.rules.assumedWinRate * 100)}% of days end green — the math does the rest.
             </p>
           </div>
         </div>

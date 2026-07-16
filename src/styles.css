@@ -122,15 +122,6 @@ body {
   color: var(--text-primary);
 }
 
-.brand-mark {
-  background: var(--accent);
-  color: #fff;
-  border-radius: 8px;
-  padding: 3px 7px;
-  font-size: 15px;
-  font-weight: 800;
-}
-
 .brand-text {
   display: flex;
   flex-direction: column;
@@ -138,7 +129,7 @@ body {
 }
 
 .brand-name {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.01em;
   white-space: nowrap;

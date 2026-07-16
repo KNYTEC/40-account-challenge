@@ -57,7 +57,6 @@ function Shell() {
       <header className="site-header">
         <div className="site-header-inner">
           <Link className="brand" to={`/${search}`}>
-            <span className="brand-mark">40</span>
             <span className="brand-text">
               <span className="brand-name">{config.brand}</span>
               <span className="brand-tag">{config.slogan}</span>
