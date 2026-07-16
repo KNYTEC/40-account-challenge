@@ -134,6 +134,32 @@ export function investmentTotal(config) {
     : config.investment.total
 }
 
+// The big motivational countdown: how many winning days (green days at the
+// +$250 daily max) still stand between today and the first payout / $60K.
+// Recomputes from cumulative P&L, so every new day moves it.
+export function computeCountdown(stats, config) {
+  const { accounts, milestones, rules } = config
+  const payoutTargetPerAccount = milestones.evalPassPerAccount + milestones.fundedProfitForPayout
+  const remaining = payoutTargetPerAccount - stats.cumPerAccount
+  const winAmount = rules.dailyWinLockout
+  const winningDays = remaining <= 0 ? 0 : Math.ceil(remaining / winAmount)
+
+  // How much a single winning day just moved the counter — for the "−1 today"
+  // style motivation. Positive when the latest day was green.
+  let movedToday = 0
+  if (stats.latest) movedToday = stats.latest.pnl / winAmount
+
+  return {
+    unlocked: remaining <= 0,
+    winningDays,
+    winAmount,
+    withdrawalTotal: milestones.withdrawalPerAccount * accounts,
+    remainingPerAccount: Math.max(0, remaining),
+    movedToday,
+    evalPassed: stats.cumPerAccount >= milestones.evalPassPerAccount,
+  }
+}
+
 // The motivational callout for the latest recorded day.
 export function computeCallout(stats, config) {
   const { latest, pace } = stats

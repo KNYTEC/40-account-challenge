@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { money, signedMoney } from '../lib/format'
-import { investmentTotal } from '../lib/stats.js'
+import { computeCountdown, investmentTotal } from '../lib/stats.js'
 import { Callout, Milestones } from '../components/panels.jsx'
 import { SocialCards } from '../components/social.jsx'
 
@@ -19,6 +19,7 @@ export default function Home({ stats, milestones, callout, config }) {
   const status = statusOf(stats)
   const { latest, streak, cumTotal } = stats
   const glow = cumTotal > 0 ? 'good' : cumTotal < 0 ? 'bad' : 'accent'
+  const countdown = computeCountdown(stats, config)
 
   return (
     <div className="home">
@@ -59,6 +60,38 @@ export default function Home({ stats, milestones, callout, config }) {
             💵 The stake
           </Link>
         </div>
+      </section>
+
+      <section className="countdown" aria-live="polite">
+        <div className={`cd-glow ${countdown.unlocked ? 'good' : 'accent'}`} aria-hidden="true" />
+        {countdown.unlocked ? (
+          <div className="cd-inner">
+            <p className="cd-num unlocked">🎉</p>
+            <p className="cd-label">Payout unlocked</p>
+            <p className="cd-sub">
+              The first {money(countdown.withdrawalTotal)} is on the table — {config.slogan}
+            </p>
+          </div>
+        ) : (
+          <div className="cd-inner">
+            <p className="cd-kick">The countdown</p>
+            <p className="cd-num">{countdown.winningDays}</p>
+            <p className="cd-label">
+              winning days to your first {money(countdown.withdrawalTotal)}
+            </p>
+            <p className="cd-sub">
+              {countdown.evalPassed ? 'Eval passed — funded and counting. ' : ''}
+              At +{money(countdown.winAmount)} a day, that's all that stands between here and the payout. Every green
+              day ticks it down; every −{money(Math.abs(config.rules.dailyLossLockout))} day pushes it back.
+              {latest && latest.pnl > 0 && (
+                <>
+                  {' '}
+                  <span className="cd-moved">Yesterday moved it −{(Math.round(countdown.movedToday * 10) / 10)}.</span>
+                </>
+              )}
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="section">
