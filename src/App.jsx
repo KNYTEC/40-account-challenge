@@ -1,10 +1,21 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { BrowserRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import config from './data/config.json'
 import realEntries from './data/entries.json'
 import demoEntries from './data/demoEntries.json'
 import { computeCallout, computeMilestones, computeStats } from './lib/stats.js'
-import { Callout, Hero, HistoryTable, Milestones, StatTiles, Transparency } from './components/panels.jsx'
-import { CumulativeChart, DailyChart } from './components/charts.jsx'
+import { SocialIcons } from './components/social.jsx'
+import Home from './pages/Home.jsx'
+import CalendarPage from './pages/CalendarPage.jsx'
+import StatsPage from './pages/StatsPage.jsx'
+import StakePage from './pages/StakePage.jsx'
+
+const TITLES = {
+  '/': 'Live Status',
+  '/calendar': 'Daily P&L Calendar',
+  '/stats': 'Full Stats & Charts',
+  '/stake': 'The Stake',
+}
 
 function currentTheme() {
   const saved = document.documentElement.dataset.theme
@@ -12,8 +23,9 @@ function currentTheme() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-export default function App() {
-  const demo = new URLSearchParams(window.location.search).has('demo')
+function Shell() {
+  const { pathname, search } = useLocation()
+  const demo = new URLSearchParams(search).has('demo')
   const entries = demo ? demoEntries : realEntries
 
   const [theme, setTheme] = useState(currentTheme)
@@ -28,73 +40,99 @@ export default function App() {
     setTheme(next)
   }
 
+  useEffect(() => {
+    document.title = `${TITLES[pathname] ?? 'Live Status'} — ${config.challengeName}`
+  }, [pathname])
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
   const stats = useMemo(() => computeStats(entries, config), [entries])
   const milestones = useMemo(() => computeMilestones(stats, config), [stats])
   const callout = useMemo(() => computeCallout(stats, config), [stats])
 
   return (
-    <div className="wrap">
-      <header className="header">
-        <div>
-          <h1>{config.challengeName}</h1>
-          <p className="sub">
-            One trader. {config.accounts} prop accounts. Every trade copied, every dollar public. · {config.series}
-          </p>
-        </div>
-        <div className="header-right">
-          <span className="day-chip">
-            {stats.daysTraded > 0 ? `Day ${stats.daysTraded}` : 'Day 0'}
-          </span>
-          <button className="theme-btn" onClick={toggleTheme} aria-label="Toggle color theme">
-            {theme === 'dark' ? '☀' : '☾'}
-          </button>
+    <>
+      <header className="site-header">
+        <div className="site-header-inner">
+          <Link className="brand" to={`/${search}`}>
+            <span className="brand-mark">40</span>
+            <span className="brand-name">Account Challenge</span>
+          </Link>
+          <nav className="nav" aria-label="Site">
+            <NavLink to={`/${search}`} end>
+              Status
+            </NavLink>
+            <NavLink to={`/calendar${search}`}>Calendar</NavLink>
+            <NavLink to={`/stats${search}`}>Stats</NavLink>
+            <NavLink to={`/stake${search}`}>The Stake</NavLink>
+          </nav>
+          <div className="header-right">
+            <SocialIcons socials={config.socials} />
+            <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle color theme">
+              {theme === 'dark' ? '☀' : '☾'}
+            </button>
+          </div>
         </div>
       </header>
 
-      {demo && (
-        <div className="demo-banner">
-          Demo data — this is a preview with sample numbers. <a href="/">View the real tracker</a>.
-        </div>
-      )}
-
-      <div className="stack">
-        <Callout callout={callout} />
-        <Hero stats={stats} config={config} />
-        <StatTiles stats={stats} config={config} />
-        <Milestones milestones={milestones} stats={stats} />
-
-        <div className="grid-2">
-          <div className="card">
-            <h2>Equity curve — all {config.accounts} accounts</h2>
-            <p className="card-sub">Cumulative P&L, one representative account × {config.accounts}.</p>
-            {stats.rows.length ? (
-              <CumulativeChart rows={stats.rows} />
-            ) : (
-              <div className="chart-empty">The curve starts with the first recorded trading day.</div>
-            )}
+      <main className="wrap">
+        {demo && (
+          <div className="demo-banner">
+            Demo data — this is a preview with sample numbers. <Link to={pathname}>View the real tracker</Link>.
           </div>
-          <div className="card">
-            <h2>Daily results</h2>
-            <p className="card-sub">
-              Green days cap at +$
-              {(config.rules.dailyWinLockout * config.accounts).toLocaleString('en-US')}, red days at −$
-              {(Math.abs(config.rules.dailyLossLockout) * config.accounts).toLocaleString('en-US')} — by rule.
+        )}
+
+        <Routes>
+          <Route path="/" element={<Home stats={stats} milestones={milestones} callout={callout} config={config} />} />
+          <Route path="/calendar" element={<CalendarPage stats={stats} config={config} />} />
+          <Route path="/stats" element={<StatsPage stats={stats} config={config} />} />
+          <Route path="/stake" element={<StakePage stats={stats} config={config} />} />
+          <Route
+            path="*"
+            element={<Home stats={stats} milestones={milestones} callout={callout} config={config} />}
+          />
+        </Routes>
+      </main>
+
+      <footer className="site-footer">
+        <div className="site-footer-inner">
+          <div className="foot-col">
+            <p className="foot-brand">
+              {config.challengeName} · {config.series}
             </p>
-            {stats.rows.length ? (
-              <DailyChart rows={stats.rows} />
-            ) : (
-              <div className="chart-empty">No trading days recorded yet.</div>
-            )}
+            <p className="foot-copy">
+              One trader, {config.accounts} prop accounts, every dollar public. Updated manually after each trading
+              day. Not financial advice — this is entertainment and documentation, not a recommendation.
+            </p>
+          </div>
+          <div className="foot-col">
+            <p className="foot-head">Explore</p>
+            <Link to={`/${search}`}>Live status</Link>
+            <Link to={`/calendar${search}`}>Daily P&L calendar</Link>
+            <Link to={`/stats${search}`}>Full stats & charts</Link>
+            <Link to={`/stake${search}`}>The stake</Link>
+          </div>
+          <div className="foot-col">
+            <p className="foot-head">Follow</p>
+            <a href={config.socials.youtube} target="_blank" rel="noreferrer">
+              YouTube — trade recaps
+            </a>
+            <a href={config.socials.instagram} target="_blank" rel="noreferrer">
+              Instagram — behind the scenes
+            </a>
           </div>
         </div>
-
-        <Transparency config={config} stats={stats} />
-        <HistoryTable rows={stats.rows} />
-      </div>
-
-      <footer className="footer">
-        Updated manually after each trading day · {config.series} — {config.challengeName} · Not financial advice
       </footer>
-    </div>
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Shell />
+    </BrowserRouter>
   )
 }

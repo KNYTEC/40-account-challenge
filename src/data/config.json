@@ -16,9 +16,14 @@
   "investment": {
     "total": 3800,
     "description": "40 × $50K evaluation accounts",
-    "breakdown": [
-      { "label": "Prop firm evaluations — 40 × $50K accounts (avg $95 each)", "amount": 3800 }
+    "breakdownFinal": false,
+    "firms": [
+      { "firm": "Prop firm evals — exact per-firm breakdown coming soon", "accounts": 40, "costPerAccount": 95 }
     ]
   },
-  "payouts": []
+  "payouts": [],
+  "socials": {
+    "youtube": "https://www.youtube.com/@mnqdegen",
+    "instagram": "https://www.instagram.com/mnqdegen"
+  }
 }

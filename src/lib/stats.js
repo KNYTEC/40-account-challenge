@@ -125,6 +125,15 @@ export function computeMilestones(stats, config) {
   ]
 }
 
+// Total stake, computed from the per-firm rows so the whole site updates
+// when the exact eval costs land in config.
+export function investmentTotal(config) {
+  const firms = config.investment.firms || []
+  return firms.length
+    ? firms.reduce((s, f) => s + f.accounts * f.costPerAccount, 0)
+    : config.investment.total
+}
+
 // The motivational callout for the latest recorded day.
 export function computeCallout(stats, config) {
   const { latest, pace } = stats

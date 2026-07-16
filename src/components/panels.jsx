@@ -1,4 +1,4 @@
-import { longDate, money, pct, signedMoney } from '../lib/format'
+import { longDate, pct, signedMoney } from '../lib/format'
 
 export function Callout({ callout }) {
   const icon = callout.tone === 'good' ? '▲' : callout.tone === 'bad' ? '▼' : '◆'
@@ -139,74 +139,6 @@ export function Milestones({ milestones, stats }) {
           </div>
         </div>
       ))}
-    </div>
-  )
-}
-
-export function Transparency({ config, stats }) {
-  const { investment, payouts, rules, accounts } = config
-  const withdrawn = payouts.reduce((s, p) => s + p.amount, 0)
-  const net = withdrawn - investment.total
-  return (
-    <div className="grid-2">
-      <div className="card">
-        <h2>The stake — full transparency</h2>
-        <p className="card-sub">{investment.description}. Every dollar in and out, in the open.</p>
-        <table className="t-table">
-          <tbody>
-            {investment.breakdown.map((b) => (
-              <tr key={b.label}>
-                <td className="muted-cell">{b.label}</td>
-                <td>{money(b.amount)}</td>
-              </tr>
-            ))}
-            <tr className="total-row">
-              <td>Initial investment</td>
-              <td>{money(investment.total)}</td>
-            </tr>
-            <tr>
-              <td className="muted-cell">Withdrawn to date</td>
-              <td>{money(withdrawn)}</td>
-            </tr>
-            <tr className="total-row">
-              <td>Net cash position</td>
-              <td>
-                <span className={`delta ${net >= 0 ? 'up' : 'down'}`}>{signedMoney(net)}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div className="card">
-        <h2>The rules</h2>
-        <p className="card-sub">Same trades copied across every account, hard stops every day.</p>
-        <ul className="rules-list">
-          <li>
-            <span className="rk">Accounts running in parallel</span>
-            <span className="rv">{accounts} × $50K evals</span>
-          </li>
-          <li>
-            <span className="rk">Daily win lockout (per account)</span>
-            <span className="rv">+{money(rules.dailyWinLockout)} hard stop</span>
-          </li>
-          <li>
-            <span className="rk">Daily loss lockout (per account)</span>
-            <span className="rv">−{money(Math.abs(rules.dailyLossLockout))} hard stop</span>
-          </li>
-          <li>
-            <span className="rk">Assumed win rate</span>
-            <span className="rv">~{pct(rules.assumedWinRate)}</span>
-          </li>
-          <li>
-            <span className="rk">Data source</span>
-            <span className="rv">Manual daily entry</span>
-          </li>
-          <li>
-            <span className="rk">Worst case, per day</span>
-            <span className="rv">−{money(Math.abs(rules.dailyLossLockout) * accounts)} across all accounts</span>
-          </li>
-        </ul>
-      </div>
     </div>
   )
 }

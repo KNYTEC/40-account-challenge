@@ -25,19 +25,20 @@ a JSON file in this repo. Every push redeploys the site on Vercel.
 **Corrections:** add the same date again with the right number — the latest
 entry for a date wins. (Or just edit the existing line.)
 
-## What the dashboard shows
+## The site
 
-- **Hero + stat tiles** — cumulative challenge P&L (×40), today's result,
-  win rate, streaks, days traded.
-- **Milestones** — progress bars toward eval pass ($3,000/account), first
-  payout unlock ($4,000 funded profit/account), and the $60,000 first
-  withdrawal ($1,500 × 40), with estimated trading days remaining.
-- **Motivational callout** — dynamic copy based on the latest day
-  (win lockout, loss lockout, green/red day).
-- **Charts** — equity curve and daily results, with hover tooltips.
-- **Transparency panel** — the ~$3,800 stake, withdrawals to date, net cash
-  position, and the challenge rules.
-- **History table** — every recorded day, the source of truth.
+- **`/` Live status (home)** — landing page: day counter + status word,
+  giant cumulative P&L, today's result, motivational callout, the mission /
+  rules / roadmap sections, and follow links (YouTube + Instagram).
+- **`/calendar`** — daily P&L calendar, month by month, trading-journal
+  style (green/red day cells with lockout badges and month totals).
+- **`/stats`** — stat tiles, equity curve, daily results chart, and the
+  full history table (the source of truth).
+- **`/stake`** — full transparency: per-firm eval cost table, cash
+  in / cash out, net position, and the challenge rules.
+
+Socials are configured in `src/data/config.json` → `socials`
+(YouTube + Instagram, currently `@mnqdegen`).
 
 ### Demo preview
 
@@ -48,9 +49,20 @@ Append `?demo=1` to the URL to preview the dashboard with sample data
 
 All challenge parameters live in `src/data/config.json`: account count,
 lockout amounts, milestone targets, baseline pace ($250/day, used for
-projections until real history exists), the investment breakdown shown in
-the transparency panel, and a `payouts` array for recording real
-withdrawals as they happen:
+projections until real history exists), socials, and a `payouts` array for
+recording real withdrawals as they happen.
+
+The stake page's firm table is driven by `investment.firms` — one row per
+prop firm. The total stake shown across the site is computed from these
+rows, so updating them updates everything. Set `breakdownFinal: true` once
+the exact costs are in to drop the "being finalized" note:
+
+```json
+"firms": [
+  { "firm": "Topstep", "accounts": 10, "costPerAccount": 49 },
+  { "firm": "Apex", "accounts": 15, "costPerAccount": 35 }
+]
+```
 
 ```json
 "payouts": [{ "date": "2026-08-15", "amount": 60000, "label": "First payout cycle" }]
