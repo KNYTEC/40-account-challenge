@@ -82,12 +82,13 @@ export function computeMilestones(stats, config) {
   const { accounts, milestones } = config
   const cum = stats.cumPerAccount
   const evalTarget = milestones.evalPassPerAccount
+  const model = computePayoutModel(config)
   const payout1Target = evalTarget + milestones.fundedProfitForPayout // $7,000/acct
-  // Payout #1 withdraws $1,500/acct (balance $4,000 → $2,500); payout #2 fires
-  // when the account rebuilds to the same $4,000 — i.e. the withdrawn amount.
-  const payout2Target = payout1Target + milestones.withdrawalPerAccount // $8,500/acct
-  const payout1Total = milestones.withdrawalPerAccount * accounts // $60,000
-  const payout2Total = payout1Total + milestones.payout2PerAccount * accounts // $100,000
+  // Payout #1 withdraws each firm's max at the $4,000 gate; payout #2 fires
+  // when the slowest accounts have rebuilt to the same gate.
+  const payout2Target = payout1Target + model.maxRebuild // $9,000/acct
+  const payout1Total = model.perCycle // $65,000 to the trader
+  const payout2Total = model.total // $130,000 across both cycles
   const etaDays = (remaining) =>
     remaining <= 0 ? 0 : Math.ceil(remaining / stats.pace)
 
@@ -133,7 +134,7 @@ export function computeMilestones(stats, config) {
     {
       key: 'payout1',
       title: 'First payout',
-      subtitle: `${moneyish(milestones.withdrawalPerAccount)} × ${accounts} accounts = ${moneyish(payout1Total)}`,
+      subtitle: `every account withdraws its firm's max at the ${moneyish(milestones.fundedProfitForPayout)} gate → ${moneyish(payout1Total)} to the trader`,
       pct: payout1Pct,
       done: cum >= payout1Target,
       locked: cum < bufferTarget,
@@ -143,11 +144,11 @@ export function computeMilestones(stats, config) {
     {
       key: 'payout2',
       title: 'Second payout',
-      subtitle: `rebuild ${moneyish(milestones.fundedProfitForPayout - milestones.withdrawalPerAccount)} → ${moneyish(milestones.fundedProfitForPayout)} per account · +${moneyish(milestones.payout2PerAccount * accounts)} → ${moneyish(payout2Total)} total`,
+      subtitle: `rebuild to the ${moneyish(milestones.fundedProfitForPayout)} gate · +${moneyish(model.perCycle)} → ${moneyish(payout2Total)} total`,
       pct: payout2Pct,
       done: cum >= payout2Target,
       locked: cum < payout1Target,
-      valueText: `${moneyish(payout2Total)} total · unlocks after ${Math.round(milestones.withdrawalPerAccount / config.rules.dailyWinLockout)} more winning days`,
+      valueText: `${moneyish(payout2Total)} total · unlocks after ${model.rebuildDays} more winning days`,
       etaDays: etaDays(payout2Target - cum),
     },
   ]
@@ -162,18 +163,43 @@ export function investmentTotal(config) {
     : config.investment.total
 }
 
+// Real payout economics, derived from each firm's actual rules (config
+// firms[].payout). At the $4K-profit gate every account withdraws its firm's
+// max; the trader receives their share after the firm's split.
+// - perCycle: what lands in the trader's pocket per payout cycle
+// - maxRebuild: the largest per-account withdrawal — the wall moves together,
+//   so payout #2 waits for the slowest accounts to rebuild to the $4K gate
+export function computePayoutModel(config) {
+  const firms = config.investment.firms || []
+  let perCycle = 0
+  let maxRebuild = 0
+  for (const f of firms) {
+    const w = f.payout?.maxWithdraw ?? 0
+    perCycle += f.accounts * w * (f.payout?.traderShare ?? 1)
+    maxRebuild = Math.max(maxRebuild, w)
+  }
+  return {
+    perCycle, // $65,000
+    total: perCycle * 2, // $130,000 across two cycles
+    maxRebuild, // $2,000
+    rebuildDays: Math.ceil(maxRebuild / config.rules.dailyWinLockout), // 8
+  }
+}
+
 // The big motivational countdown: how many winning days (green days at the
-// +$250 daily max) still stand between today and the FULL $100K in payouts.
+// +$250 daily max) still stand between today and the FULL $130K in payouts.
 // Assumes every next day is a win. Recomputes from cumulative P&L, so every
-// new day moves it. Payout #1 ($60K) is a marker along the way.
+// new day moves it. Payout #1 ($65K) is a marker along the way.
 export function computeCountdown(stats, config) {
   const { accounts, milestones, rules } = config
   const winAmount = rules.dailyWinLockout
   const cum = stats.cumPerAccount
 
+  const model = computePayoutModel(config)
   const payout1TargetPerAccount = milestones.evalPassPerAccount + milestones.fundedProfitForPayout // $7,000
-  // after withdrawing $1,500/acct the balance rebuilds to the same $4,000 gate
-  const payout2TargetPerAccount = payout1TargetPerAccount + milestones.withdrawalPerAccount // $8,500
+  // after each firm's max withdrawal, the slowest accounts rebuild $2,000
+  // back to the same $4,000 gate
+  const payout2TargetPerAccount = payout1TargetPerAccount + model.maxRebuild // $9,000
 
   const remaining = payout2TargetPerAccount - cum
   const winningDays = remaining <= 0 ? 0 : Math.ceil(remaining / winAmount)
@@ -181,8 +207,8 @@ export function computeCountdown(stats, config) {
   const bankedWinningDays = Math.max(0, Math.min(totalWinningDays, Math.round(cum / winAmount)))
   const progressPct = clamp01(cum / payout2TargetPerAccount)
 
-  const payout1Total = milestones.withdrawalPerAccount * accounts // $60,000
-  const payout2Total = payout1Total + milestones.payout2PerAccount * accounts // $100,000
+  const payout1Total = model.perCycle // $65,000 to the trader
+  const payout2Total = model.total // $130,000 across both cycles
   const payout1RemainingPerAccount = Math.max(0, payout1TargetPerAccount - cum)
   const payout1WinningDaysLeft =
     payout1RemainingPerAccount <= 0 ? 0 : Math.ceil(payout1RemainingPerAccount / winAmount)
@@ -194,12 +220,12 @@ export function computeCountdown(stats, config) {
 
   return {
     unlocked: remaining <= 0,
-    winningDays, // to the full $100K
+    winningDays, // to the full $130K
     winAmount,
     totalWinningDays, // 35
     bankedWinningDays,
     progressPct,
-    withdrawalTotal: payout2Total, // full $100K
+    withdrawalTotal: payout2Total, // full $130K
     remainingPerAccount: Math.max(0, remaining),
     movedToday,
     evalPassed: cum >= milestones.evalPassPerAccount,

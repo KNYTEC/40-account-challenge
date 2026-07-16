@@ -113,7 +113,7 @@ export function WinCelebration({ latest, countdown, stats }) {
         <strong>MISSION COMPLETE</strong>
         <span className="cb-meta">
           +1 winning day
-          {left > 0 && <> · {left} to $100K</>}
+          {left > 0 && <> · {left} to ${Math.round(countdown.withdrawalTotal / 1000)}K</>}
           {streak >= 2 && <> · 🔥 {streak} streak</>}
         </span>
       </span>

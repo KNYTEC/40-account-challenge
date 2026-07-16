@@ -1,6 +1,6 @@
 {
   "challengeName": "40 Account Challenge",
-  "tagline": "34 winning days. $100K in payouts.",
+  "tagline": "36 winning days. $130K in payouts.",
   "series": "MNQDegen",
   "brand": "MNQDegen",
   "handle": "@mnqdegen",
@@ -17,9 +17,7 @@
   "milestones": {
     "evalPassPerAccount": 3000,
     "bufferPerAccount": 2000,
-    "fundedProfitForPayout": 4000,
-    "withdrawalPerAccount": 1500,
-    "payout2PerAccount": 1000
+    "fundedProfitForPayout": 4000
   },
   "investment": {
     "total": 3765,
@@ -28,11 +26,41 @@
     "breakdownFinal": true,
     "pricingNote": "Tradeify Select was bought as a $470 5-pack and Apex EOD as $495 × 4 (20 accounts) — those two show the effective per-eval cost; the rest are unit price × 5.",
     "firms": [
-      { "firm": "Topstep", "accountType": "$50K · No activation fee", "accounts": 5, "costPerAccount": 85 },
-      { "firm": "MyFundedFutures", "accountType": "$50K · Flex Plan", "accounts": 5, "costPerAccount": 80 },
-      { "firm": "Tradeify", "accountType": "$50K · Select", "accounts": 5, "costPerAccount": 94 },
-      { "firm": "Lucid", "accountType": "$50K · Flex", "accounts": 5, "costPerAccount": 98 },
-      { "firm": "Apex", "accountType": "$50K · EOD, no activation fee", "accounts": 20, "costPerAccount": 99 }
+      {
+        "firm": "Topstep",
+        "accountType": "$50K · No activation fee",
+        "accounts": 5,
+        "costPerAccount": 85,
+        "payout": { "maxWithdraw": 2000, "traderShare": 0.9, "note": "50% of profits at $4K · 90/10 split" }
+      },
+      {
+        "firm": "MyFundedFutures",
+        "accountType": "$50K · Flex Plan",
+        "accounts": 5,
+        "costPerAccount": 80,
+        "payout": { "maxWithdraw": 2000, "traderShare": 0.8, "note": "50% of profits, max $2,000 · 80/20 split" }
+      },
+      {
+        "firm": "Tradeify",
+        "accountType": "$50K · Select",
+        "accounts": 5,
+        "costPerAccount": 94,
+        "payout": { "maxWithdraw": 2000, "traderShare": 0.9, "note": "50% of profits, max $3,000 · 90/10 split" }
+      },
+      {
+        "firm": "Lucid",
+        "accountType": "$50K · Flex",
+        "accounts": 5,
+        "costPerAccount": 98,
+        "payout": { "maxWithdraw": 2000, "traderShare": 0.9, "note": "50% of profits, max $2,000 · 90/10 split" }
+      },
+      {
+        "firm": "Apex",
+        "accountType": "$50K · EOD, no activation fee",
+        "accounts": 20,
+        "costPerAccount": 99,
+        "payout": { "maxWithdraw": 1500, "traderShare": 1.0, "note": "max $1,500 per payout · no split" }
+      }
     ]
   },
   "payouts": [],

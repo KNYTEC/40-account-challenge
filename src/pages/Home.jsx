@@ -37,7 +37,7 @@ export default function Home({ stats, milestones, callout, config }) {
     `${config.accounts} accounts synced`,
     `Day ${stats.daysTraded}`,
     `${signedMoney(cumTotal)} total P&L`,
-    `${countdown.winningDays} winning days to $100K`,
+    `${countdown.winningDays} winning days to $${Math.round(countdown.withdrawalTotal / 1000)}K`,
     `Win lock +$${config.rules.dailyWinLockout}`,
     `Loss lock −$${Math.abs(config.rules.dailyLossLockout)}`,
     '$2M in funding',

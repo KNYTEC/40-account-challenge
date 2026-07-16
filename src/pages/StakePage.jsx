@@ -1,9 +1,10 @@
 import { money, pct, signedMoney } from '../lib/format'
-import { investmentTotal } from '../lib/stats.js'
+import { computePayoutModel, investmentTotal } from '../lib/stats.js'
 
 export default function StakePage({ stats, config }) {
   const { investment, payouts, rules, accounts } = config
   const total = investmentTotal(config)
+  const model = computePayoutModel(config)
   const withdrawn = payouts.reduce((s, p) => s + p.amount, 0)
   const net = withdrawn - total
   const totalAccounts = (investment.firms || []).reduce((s, f) => s + f.accounts, 0)
@@ -49,6 +50,8 @@ export default function StakePage({ stats, config }) {
                   <th className="num">Accounts</th>
                   <th className="num">Cost per eval</th>
                   <th className="num">Total</th>
+                  <th>First payout rule</th>
+                  <th className="num">Payout / acct</th>
                 </tr>
               </thead>
               <tbody>
@@ -59,6 +62,10 @@ export default function StakePage({ stats, config }) {
                     <td className="num">{f.accounts}</td>
                     <td className="num">{money(f.costPerAccount)}</td>
                     <td className="num">{money(f.accounts * f.costPerAccount)}</td>
+                    <td className="note-cell">{f.payout?.note}</td>
+                    <td className="num">
+                      {f.payout ? money(f.payout.maxWithdraw * f.payout.traderShare) : '—'}
+                    </td>
                   </tr>
                 ))}
                 <tr className="total-row">
@@ -67,6 +74,8 @@ export default function StakePage({ stats, config }) {
                   <td className="num">{totalAccounts}</td>
                   <td className="num" />
                   <td className="num">{money(total)}</td>
+                  <td className="note-cell">per payout cycle, after splits</td>
+                  <td className="num">{money(model.perCycle)}</td>
                 </tr>
               </tbody>
             </table>
@@ -79,7 +88,7 @@ export default function StakePage({ stats, config }) {
             <h2>Cash in, cash out</h2>
             <p className="card-sub">
               The only numbers that matter at the end of the story. Target: two payout cycles ={' '}
-              {money((config.milestones.withdrawalPerAccount + config.milestones.payout2PerAccount) * accounts)}.
+              {money(model.total)}, from each firm's real payout rules.
             </p>
             <table className="t-table">
               <tbody>
@@ -88,12 +97,12 @@ export default function StakePage({ stats, config }) {
                   <td>−{money(total)}</td>
                 </tr>
                 <tr>
-                  <td className="muted-cell">Payout #1 target ({money(config.milestones.withdrawalPerAccount)} × {accounts})</td>
-                  <td>{money(config.milestones.withdrawalPerAccount * accounts)}</td>
+                  <td className="muted-cell">Payout #1 target (real firm rules, after splits)</td>
+                  <td>{money(model.perCycle)}</td>
                 </tr>
                 <tr>
-                  <td className="muted-cell">Payout #2 target ({money(config.milestones.payout2PerAccount)} × {accounts})</td>
-                  <td>{money(config.milestones.payout2PerAccount * accounts)}</td>
+                  <td className="muted-cell">Payout #2 target (same rules, after rebuild)</td>
+                  <td>{money(model.perCycle)}</td>
                 </tr>
                 <tr>
                   <td className="muted-cell">Withdrawn to date</td>
