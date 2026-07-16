@@ -1,0 +1,24 @@
+{
+  "challengeName": "40 Account Challenge",
+  "series": "MNQDegen",
+  "accounts": 40,
+  "rules": {
+    "dailyWinLockout": 250,
+    "dailyLossLockout": -100,
+    "assumedWinRate": 0.6
+  },
+  "baselineDailyPace": 250,
+  "milestones": {
+    "evalPassPerAccount": 3000,
+    "fundedProfitForPayout": 4000,
+    "withdrawalPerAccount": 1500
+  },
+  "investment": {
+    "total": 3800,
+    "description": "40 × $50K evaluation accounts",
+    "breakdown": [
+      { "label": "Prop firm evaluations — 40 × $50K accounts (avg $95 each)", "amount": 3800 }
+    ]
+  },
+  "payouts": []
+}

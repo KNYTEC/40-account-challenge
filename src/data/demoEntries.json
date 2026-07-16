@@ -1,0 +1,17 @@
+[
+  { "date": "2026-06-22", "pnl": 250, "note": "Clean morning session — win lockout by 10:15" },
+  { "date": "2026-06-23", "pnl": 250 },
+  { "date": "2026-06-24", "pnl": -100, "note": "Choppy open, loss lockout did its job" },
+  { "date": "2026-06-25", "pnl": 250 },
+  { "date": "2026-06-26", "pnl": 185, "note": "Ended the day early, no lockout" },
+  { "date": "2026-06-29", "pnl": 250 },
+  { "date": "2026-06-30", "pnl": -100 },
+  { "date": "2026-07-01", "pnl": 250 },
+  { "date": "2026-07-02", "pnl": 250 },
+  { "date": "2026-07-03", "pnl": 250 },
+  { "date": "2026-07-06", "pnl": -60, "note": "Scratched out small red" },
+  { "date": "2026-07-07", "pnl": 250 },
+  { "date": "2026-07-08", "pnl": 250 },
+  { "date": "2026-07-09", "pnl": 140 },
+  { "date": "2026-07-10", "pnl": 250 }
+]
