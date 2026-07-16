@@ -128,12 +128,27 @@ body {
   font-weight: 800;
 }
 
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
 .brand-name {
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  font-size: 13.5px;
-  font-weight: 750;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   white-space: nowrap;
+}
+
+.brand-tag {
+  font-size: 9.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--accent);
+  white-space: nowrap;
+  margin-top: 1px;
 }
 
 .nav {
@@ -205,8 +220,8 @@ body {
   cursor: default;
 }
 
-@media (max-width: 640px) {
-  .brand-name {
+@media (max-width: 700px) {
+  .brand-tag {
     display: none;
   }
 }
@@ -727,6 +742,37 @@ body {
   position: relative;
 }
 
+.hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 0 14px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.hk-name {
+  font-weight: 800;
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+}
+
+.hk-sep {
+  color: var(--accent);
+}
+
+.hk-slogan {
+  font-size: 12.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
 .eyebrow {
   font-size: 13px;
   font-weight: 750;
@@ -1126,12 +1172,27 @@ body {
   font-size: 13.5px;
 }
 
-.foot-brand {
-  font-weight: 750;
+.foot-wordmark {
+  font-weight: 800;
   margin: 0;
+  font-size: 22px;
+  letter-spacing: 0.01em;
+}
+
+.foot-slogan {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  font-weight: 650;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.09em;
+  color: var(--accent);
+}
+
+.foot-handle {
+  margin: 6px 0 0;
   font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .foot-copy {

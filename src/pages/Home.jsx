@@ -24,6 +24,11 @@ export default function Home({ stats, milestones, callout, config }) {
     <div className="home">
       <section className="hero-status">
         <div className={`hero-glow ${glow}`} aria-hidden="true" />
+        <p className="hero-kicker">
+          <span className="hk-name">{config.brand}</span>
+          <span className="hk-sep" aria-hidden="true">•</span>
+          <span className="hk-slogan">{config.slogan}</span>
+        </p>
         <p className="eyebrow">
           Day {stats.daysTraded} · Status: {status.word} {status.emoji}
         </p>
@@ -60,9 +65,10 @@ export default function Home({ stats, milestones, callout, config }) {
         <p className="section-eyebrow">The mission</p>
         <h2 className="section-title">One trader. Forty accounts. Zero secrets.</h2>
         <p className="section-copy">
-          I'm trading {config.accounts} prop firm evaluations at the same time — every account copies the exact same
-          trades, so one good day is {config.accounts} good days. Hard lockout rules cap every single day, win or
-          lose. The scoreboard on this site updates after every session, and every trade gets recapped on YouTube.
+          I'm {config.brand} — trading {config.accounts} prop firm evaluations at the same time. Every account copies
+          the exact same trades, so one good day is {config.accounts} good days. Hard lockout rules cap every single
+          day, win or lose. That's the whole idea: <strong>{config.slogan.replace(/\.$/, '')}</strong>. The scoreboard
+          here updates after every session, and every trade gets recapped on the {config.handle} channels.
         </p>
         <div className="fact-row">
           <div className="fact">
@@ -118,8 +124,11 @@ export default function Home({ stats, milestones, callout, config }) {
       </section>
 
       <section className="section">
-        <p className="section-eyebrow">Follow the journey</p>
+        <p className="section-eyebrow">Follow {config.handle}</p>
         <h2 className="section-title">Watch it happen, live and unfiltered.</h2>
+        <p className="section-copy">
+          Same handle everywhere — <strong>{config.handle}</strong> on YouTube and Instagram. {config.slogan}
+        </p>
         <SocialCards socials={config.socials} />
       </section>
     </div>

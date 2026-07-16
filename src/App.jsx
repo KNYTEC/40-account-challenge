@@ -41,7 +41,7 @@ function Shell() {
   }
 
   useEffect(() => {
-    document.title = `${TITLES[pathname] ?? 'Live Status'} — ${config.challengeName}`
+    document.title = `${TITLES[pathname] ?? 'Live'} — MNQDegen · ${config.challengeName}`
   }, [pathname])
 
   useEffect(() => {
@@ -58,7 +58,10 @@ function Shell() {
         <div className="site-header-inner">
           <Link className="brand" to={`/${search}`}>
             <span className="brand-mark">40</span>
-            <span className="brand-name">Account Challenge</span>
+            <span className="brand-text">
+              <span className="brand-name">{config.brand}</span>
+              <span className="brand-tag">{config.slogan}</span>
+            </span>
           </Link>
           <nav className="nav" aria-label="Site">
             <NavLink to={`/${search}`} end>
@@ -99,13 +102,13 @@ function Shell() {
       <footer className="site-footer">
         <div className="site-footer-inner">
           <div className="foot-col">
-            <p className="foot-brand">
-              {config.challengeName} · {config.series}
-            </p>
+            <p className="foot-wordmark">{config.brand}</p>
+            <p className="foot-slogan">{config.slogan}</p>
             <p className="foot-copy">
-              One trader, {config.accounts} prop accounts, every dollar public. Updated manually after each trading
-              day. Not financial advice — this is entertainment and documentation, not a recommendation.
+              The {config.challengeName} — one trader, {config.accounts} prop accounts, every dollar public. Updated
+              after each trading day. Not financial advice; entertainment and documentation, not a recommendation.
             </p>
+            <p className="foot-handle">{config.handle} everywhere</p>
           </div>
           <div className="foot-col">
             <p className="foot-head">Explore</p>
@@ -115,7 +118,7 @@ function Shell() {
             <Link to={`/stake${search}`}>The stake</Link>
           </div>
           <div className="foot-col">
-            <p className="foot-head">Follow</p>
+            <p className="foot-head">Follow {config.handle}</p>
             <a href={config.socials.youtube} target="_blank" rel="noreferrer">
               YouTube — trade recaps
             </a>
