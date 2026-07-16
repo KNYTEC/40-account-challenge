@@ -7,6 +7,7 @@ import { computeCallout, computeMilestones, computeStats } from './lib/stats.js'
 import { SocialIcons, socialList } from './components/social.jsx'
 import { Avatar } from './components/avatar.jsx'
 import { Backdrop } from './components/fx/Backdrop.jsx'
+import { HudFrame } from './components/fx/HudFrame.jsx'
 import Home from './pages/Home.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
 import StatsPage from './pages/StatsPage.jsx'
@@ -57,6 +58,7 @@ function Shell() {
   return (
     <>
       <Backdrop />
+      <HudFrame stats={stats} />
       <header className="site-header">
         <div className="site-header-inner">
           <Link className="brand" to={`/${search}`}>

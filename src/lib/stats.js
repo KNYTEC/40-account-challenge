@@ -187,6 +187,17 @@ export function computeCountdown(stats, config) {
   }
 }
 
+// The current status word — shared by the hero, HUD frame, etc.
+export function computeStatus(stats) {
+  const { latest } = stats
+  if (!latest) return { word: 'PRE-GAME', emoji: '🏁' }
+  if (latest.hitWinLock) return { word: 'LOCKED IN', emoji: '🔒' }
+  if (latest.pnl > 0) return { word: 'PRINTING', emoji: '💸' }
+  if (latest.hitLossLock) return { word: 'DAMAGE CONTAINED', emoji: '🛡️' }
+  if (latest.pnl < 0) return { word: 'MINOR SETBACK', emoji: '😤' }
+  return { word: 'FLAT', emoji: '😴' }
+}
+
 // The motivational callout for the latest recorded day.
 export function computeCallout(stats, config) {
   const { latest, pace } = stats

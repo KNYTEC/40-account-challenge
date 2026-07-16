@@ -1,33 +1,23 @@
 import { Link, useLocation } from 'react-router-dom'
-import { addBusinessDays, compactMoney, money, monthDay, signedMoney } from '../lib/format'
-import { computeCountdown, investmentTotal } from '../lib/stats.js'
-import { Callout, Milestones } from '../components/panels.jsx'
+import { addBusinessDays, money, monthDay, signedMoney } from '../lib/format'
+import { computeCountdown, computeStatus } from '../lib/stats.js'
+import { Callout } from '../components/panels.jsx'
 import { SocialCards } from '../components/social.jsx'
 import { WinCelebration } from '../components/celebration.jsx'
 import { CountUp } from '../components/fx/CountUp.jsx'
 import { Reveal } from '../components/fx/Reveal.jsx'
 import { Ticker } from '../components/fx/Ticker.jsx'
-import { Constellation } from '../components/fx/Constellation.jsx'
+import { AccountWall } from '../components/fx/AccountWall.jsx'
+import { MoneyMath } from '../components/fx/MoneyMath.jsx'
+import { KineticMarquee } from '../components/fx/KineticMarquee.jsx'
 
-function statusOf(stats) {
-  const { latest } = stats
-  if (!latest) return { word: 'PRE-GAME', emoji: '🏁' }
-  if (latest.hitWinLock) return { word: 'LOCKED IN', emoji: '🔒' }
-  if (latest.pnl > 0) return { word: 'PRINTING', emoji: '💸' }
-  if (latest.hitLossLock) return { word: 'DAMAGE CONTAINED', emoji: '🛡️' }
-  if (latest.pnl < 0) return { word: 'MINOR SETBACK', emoji: '😤' }
-  return { word: 'FLAT', emoji: '😴' }
-}
-
-export default function Home({ stats, milestones, callout, config }) {
+export default function Home({ stats, callout, config }) {
   const { search } = useLocation()
-  const status = statusOf(stats)
+  const status = computeStatus(stats)
   const { latest, streak, cumTotal } = stats
   const glow = cumTotal > 0 ? 'good' : cumTotal < 0 ? 'bad' : 'accent'
   const countdown = computeCountdown(stats, config)
 
-  // Estimated payout dates, assuming every next day is a win (matches the
-  // countdown model). Business days only. Computed at view time in the browser.
   const now = new Date()
   const payout1Date = countdown.payout1.unlocked
     ? null
@@ -46,41 +36,73 @@ export default function Home({ stats, milestones, callout, config }) {
     config.slogan,
   ]
 
+  // mission-track checkpoint positions (share the countdown's 0..1 scale)
+  const p2Target =
+    config.milestones.evalPassPerAccount +
+    config.milestones.fundedProfitForPayout +
+    config.milestones.payout2WinningDaysAfter * config.rules.dailyWinLockout
+  const checkpoints = [
+    {
+      pct: config.milestones.evalPassPerAccount / p2Target,
+      wd: Math.round(config.milestones.evalPassPerAccount / config.rules.dailyWinLockout),
+      label: 'EVAL PASS',
+      done: countdown.evalPassed,
+    },
+    {
+      pct: countdown.payout1.pctOfBar,
+      wd: Math.round((countdown.payout1.pctOfBar * p2Target) / config.rules.dailyWinLockout),
+      label: `$60K PAYOUT`,
+      done: countdown.payout1.unlocked,
+    },
+    {
+      pct: 1,
+      wd: countdown.totalWinningDays,
+      label: '$100K TOTAL',
+      done: countdown.unlocked,
+    },
+  ]
+
+  const ruleChips = [
+    `+$${config.rules.dailyWinLockout} WIN LOCK / DAY`,
+    `−$${Math.abs(config.rules.dailyLossLockout)} LOSS LOCK / DAY`,
+    `SYNC: ${config.copyTrader.toUpperCase()} ×${config.accounts}`,
+    'DATA: MANUAL ENTRY, DAILY',
+  ]
+
   return (
-    <div className="home">
+    <div className="home machine">
       <WinCelebration latest={latest} countdown={countdown} stats={stats} />
       <Ticker items={tickerItems} />
-      <section className="hero-status">
+
+      {/* ACT 1 — HERO */}
+      <section className="act act-hero">
         <div className={`hero-glow ${glow}`} aria-hidden="true" />
-        <p className="hero-kicker">
-          <span className="hk-name">{config.brand}</span>
-          <span className="hk-sep" aria-hidden="true">•</span>
-          <span className="hk-slogan">{config.slogan}</span>
-        </p>
-        <p className="eyebrow">
-          Day {stats.daysTraded} · Status:{' '}
+        <p className="hero-hudline">
+          DAY {stats.daysTraded} · STATUS:{' '}
           <span className="glitch" data-text={status.word}>
             {status.word}
           </span>{' '}
           {status.emoji}
+          {latest && (
+            <>
+              {' '}
+              · <span className={`delta ${latest.pnl >= 0 ? 'up' : 'down'}`}>{signedMoney(latest.dailyTotal)}</span>{' '}
+              TODAY
+            </>
+          )}
+          {streak >= 2 && <> · 🔥 {streak} STREAK</>}
         </p>
-        <h1 className="hero-title">{config.tagline}</h1>
+        <h1 className="hero-title kinetic">
+          {config.tagline.split(' ').map((w, i) => (
+            <span className="kw" key={i} style={{ '--kd': `${120 + i * 90}ms` }}>
+              <span className="kwi">{w}</span>
+            </span>
+          ))}
+        </h1>
         <p className="mega-figure">
           <CountUp value={cumTotal} format={(v) => signedMoney(v)} duration={1400} />
         </p>
-        <p className="hero-sub">
-          Total P&L across all {config.accounts} accounts
-          {latest && (
-            <>
-              {' · '}
-              <span className={`delta ${latest.pnl >= 0 ? 'up' : 'down'}`}>
-                {signedMoney(latest.dailyTotal)} today
-              </span>
-            </>
-          )}
-          {streak >= 2 && <> · 🔥 {streak}-day green streak</>}
-          {streak <= -2 && <> · {Math.abs(streak)} red days — lockouts holding</>}
-        </p>
+        <p className="hero-sub">Total P&L across all {config.accounts} accounts — every dollar public.</p>
         <Callout callout={callout} />
         <div className="cta-row">
           <Link className="btn" to={`/calendar${search}`}>
@@ -93,186 +115,138 @@ export default function Home({ stats, milestones, callout, config }) {
             💵 Costs
           </Link>
         </div>
+        <p className="scroll-cue">SCROLL TO ENTER THE MACHINE ▾</p>
       </section>
 
-      <section className="countdown" aria-live="polite">
-        <div className={`cd-glow ${countdown.unlocked ? 'good' : 'accent'}`} aria-hidden="true" />
-        {countdown.unlocked ? (
-          <div className="cd-inner">
-            <p className="cd-num unlocked">🎉</p>
-            <p className="cd-label">Payout unlocked</p>
-            <p className="cd-sub">
-              The first {money(countdown.withdrawalTotal)} is on the table — {config.slogan}
+      {/* ACT 2 — THE WALL OF 40 */}
+      <section className="act act-wall">
+        <Reveal>
+          <div className="act-inner">
+            <p className="section-eyebrow">The engine</p>
+            <h2 className="section-title">One click. Forty fills.</h2>
+            <p className="section-copy">
+              These are the real {config.accounts} accounts — every order I fire is mirrored to all of them at once
+              via {config.copyTrader}. One good day is forty good days. {config.slogan}
             </p>
           </div>
-        ) : (
-          <div className="cd-inner">
-            <p className="cd-kick">The countdown</p>
-            <p className="cd-num">
-              <CountUp
-                value={countdown.totalWinningDays - countdown.winningDays}
-                format={(v) => countdown.totalWinningDays - Math.round(v)}
-                duration={1600}
-              />
-            </p>
-            <p className="cd-label">winning days to {money(countdown.withdrawalTotal)} in payouts</p>
+        </Reveal>
+        <AccountWall
+          firms={config.investment.firms}
+          winLockout={config.rules.dailyWinLockout}
+          lossLockout={Math.abs(config.rules.dailyLossLockout)}
+        />
+      </section>
 
-            <div className="cd-bar" aria-hidden="true">
-              <span className="cd-bar-end">🚩</span>
-              <span className="cd-bar-track">
-                <span className="cd-bar-fill" style={{ width: `${Math.round(countdown.progressPct * 1000) / 10}%` }} />
-                <span
-                  className={`cd-bar-marker ${countdown.payout1.unlocked ? 'hit' : ''}`}
-                  style={{ left: `${Math.round(countdown.payout1.pctOfBar * 1000) / 10}%` }}
-                >
-                  <span className="cd-marker-label">{money(countdown.payout1.total)}</span>
-                </span>
-              </span>
-              <span className="cd-bar-end">🏆</span>
+      {/* ACT 3 — MONEY MATH (scroll scrub) */}
+      <MoneyMath config={config} />
+
+      {/* ACT 4 — THE CLIMB */}
+      <section className="act act-climb" aria-live="polite">
+        <div className="act-inner">
+          {countdown.unlocked ? (
+            <div className="cd-inner">
+              <p className="cd-num unlocked">🎉</p>
+              <p className="cd-label">Payout unlocked</p>
+              <p className="cd-sub">
+                The first {money(countdown.withdrawalTotal)} is on the table — {config.slogan}
+              </p>
             </div>
-            <p className="cd-bar-caption">
-              {countdown.bankedWinningDays} / {countdown.totalWinningDays} winning days · {countdown.winningDays} to go
-            </p>
+          ) : (
+            <div className="cd-inner">
+              <p className="cd-kick">The countdown</p>
+              <p className="cd-num">
+                <CountUp
+                  value={countdown.totalWinningDays - countdown.winningDays}
+                  format={(v) => countdown.totalWinningDays - Math.round(v)}
+                  duration={1600}
+                />
+              </p>
+              <p className="cd-label">winning days to {money(countdown.withdrawalTotal)} in payouts</p>
 
-            <p className="cd-sub">
-              {countdown.evalPassed ? 'Eval passed — funded and counting. ' : ''}
-              Assuming every next day is a +{money(countdown.winAmount)} win. Every green day ticks it down; every
-              −{money(Math.abs(config.rules.dailyLossLockout))} day pushes it back.
-              {latest && latest.pnl > 0 && (
-                <>
-                  {' '}
-                  <span className="cd-moved">Yesterday moved it −{Math.round(countdown.movedToday * 10) / 10}.</span>
-                </>
-              )}
-            </p>
+              <div className="track" aria-hidden="true">
+                <div className="track-line">
+                  <div className="track-fill" style={{ width: `${Math.round(countdown.progressPct * 1000) / 10}%` }} />
+                  <span
+                    className="track-now"
+                    style={{ left: `${Math.round(countdown.progressPct * 1000) / 10}%` }}
+                  />
+                  {checkpoints.map((c) => (
+                    <span key={c.label} className={`ck ${c.done ? 'done' : ''}`} style={{ left: `${c.pct * 100}%` }}>
+                      <span className="ck-node" />
+                      <span className="ck-label">
+                        {c.label}
+                        <em>{c.wd} WD</em>
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <p className="cd-bar-caption">
+                {countdown.bankedWinningDays} / {countdown.totalWinningDays} winning days banked ·{' '}
+                {countdown.winningDays} to go
+              </p>
 
-            <p className="cd-dates">
-              If you win every day from here:
-              {payout1Date && (
-                <>
-                  {' '}
+              <p className="cd-sub">
+                Assuming every next day is a +{money(countdown.winAmount)} win.
+                {latest && latest.pnl > 0 && (
+                  <>
+                    {' '}
+                    <span className="cd-moved">Yesterday moved it −{Math.round(countdown.movedToday * 10) / 10}.</span>
+                  </>
+                )}
+              </p>
+              <p className="cd-dates">
+                If you win every day from here:
+                {payout1Date && (
+                  <>
+                    {' '}
+                    <span className="cd-date-item">
+                      first {money(countdown.payout1.total)} <strong>~{payout1Date}</strong>
+                    </span>
+                  </>
+                )}
+                {payout1Date && payoutFullDate && <span className="cd-date-sep"> · </span>}
+                {payoutFullDate && (
                   <span className="cd-date-item">
-                    first {money(countdown.payout1.total)} <strong>~{payout1Date}</strong>
+                    full {money(countdown.withdrawalTotal)} <strong>~{payoutFullDate}</strong>
                   </span>
-                </>
-              )}
-              {payout1Date && payoutFullDate && <span className="cd-date-sep"> · </span>}
-              {payoutFullDate && (
-                <span className="cd-date-item">
-                  full {money(countdown.withdrawalTotal)} <strong>~{payoutFullDate}</strong>
-                </span>
-              )}
-            </p>
-          </div>
-        )}
-      </section>
+                )}
+              </p>
+            </div>
+          )}
 
-      <Reveal>
-        <section className="section">
-          <p className="section-eyebrow">The engine</p>
-          <h2 className="section-title">One trade. Forty accounts. Zero hesitation.</h2>
-          <p className="section-copy">
-            Every order fires from one account and hits all {config.accounts} at once via {config.copyTrader}. Watch
-            it happen — or tap the grid to fire one yourself.
-          </p>
-          <div className="card constellation-card">
-            <Constellation
-              accounts={config.accounts}
-              winLockout={config.rules.dailyWinLockout}
-              lossLockout={Math.abs(config.rules.dailyLossLockout)}
-            />
-          </div>
-        </section>
-      </Reveal>
-
-      <Reveal>
-      <section className="section">
-        <p className="section-eyebrow">The mission</p>
-        <h2 className="section-title">One trader. Forty accounts. Zero secrets.</h2>
-        <p className="section-copy">
-          I'm {config.brand} — trading {config.accounts} prop firm evaluations at the same time. Every account copies
-          the exact same trades, so one good day is {config.accounts} good days. Hard lockout rules cap every single
-          day, win or lose. That's the whole idea: <strong>{config.slogan.replace(/\.$/, '')}</strong>. The scoreboard
-          here updates after every session, and every trade gets recapped on the {config.handle} channels.
-        </p>
-        <div className="fact-row">
-          <div className="fact">
-            <p className="fact-num">
-              <CountUp value={config.accounts} />
-            </p>
-            <p className="fact-label">
-              × $50K accounts in parallel — {compactMoney(config.accounts * (config.investment.accountSize || 0))} in
-              combined funding
-            </p>
-          </div>
-          <div className="fact">
-            <p className="fact-num">
-              <CountUp value={investmentTotal(config)} format={(v) => money(v)} />
-            </p>
-            <p className="fact-label">Total stake — all-in cost of every eval</p>
-          </div>
-          <div className="fact">
-            <p className="fact-num">
-              <CountUp value={countdown.withdrawalTotal} format={(v) => money(v)} />
-            </p>
-            <p className="fact-label">Total payout target — two cycles across all accounts</p>
+          <div className="rule-chips">
+            {ruleChips.map((r) => (
+              <span className="rule-chip" key={r}>
+                {r}
+              </span>
+            ))}
           </div>
         </div>
       </section>
-      </Reveal>
 
-      <Reveal>
-      <section className="section">
-        <p className="section-eyebrow">The rules of the game</p>
-        <h2 className="section-title">Discipline is the whole strategy.</h2>
-        <div className="rule-cards">
-          <div className="rule-card">
-            <p className="rule-emoji">🎯</p>
-            <p className="rule-title">+$250 and done</p>
-            <p className="rule-copy">
-              Hit +$250 on the day and every account locks in the win. No revenge of the greed — the platform shuts
-              me off.
-            </p>
-          </div>
-          <div className="rule-card">
-            <p className="rule-emoji">🛑</p>
-            <p className="rule-title">−$100 max pain</p>
-            <p className="rule-copy">
-              A red day can never cost more than $100 per account. Worst case across the whole challenge:{' '}
-              −{money(Math.abs(config.rules.dailyLossLockout) * config.accounts)} — that's it.
-            </p>
-          </div>
-          <div className="rule-card">
-            <p className="rule-emoji">📋</p>
-            <p className="rule-title">One plan × {config.accounts}</p>
-            <p className="rule-copy">
-              Same setups, same entries, mirrored to every account via {config.copyTrader}. Roughly{' '}
-              {Math.round(config.rules.assumedWinRate * 100)}% of days end green — the math does the rest.
-            </p>
-          </div>
-        </div>
-      </section>
-      </Reveal>
+      {/* ACT 5 — KINETIC MARQUEE */}
+      <KineticMarquee
+        lines={[
+          { text: 'DEGENERATE WITH DISCIPLINE' },
+          { text: `$100K IN PAYOUTS · ${countdown.totalWinningDays} WINNING DAYS`, solid: true },
+        ]}
+      />
 
-      <Reveal>
-      <section className="section">
-        <p className="section-eyebrow">The roadmap</p>
-        <h2 className="section-title">Three checkpoints to {money(countdown.withdrawalTotal)} in payouts.</h2>
-        <Milestones milestones={milestones} stats={stats} />
+      {/* ACT 6 — FOLLOW */}
+      <section className="act act-follow">
+        <Reveal>
+          <div className="act-inner">
+            <p className="section-eyebrow">Follow {config.handle}</p>
+            <h2 className="section-title">Watch it happen, live and unfiltered.</h2>
+            <p className="section-copy">
+              Same handle everywhere — <strong>{config.handle}</strong> on YouTube, Kick, X, Instagram &amp; TikTok.{' '}
+              {config.slogan}
+            </p>
+            <SocialCards socials={config.socials} />
+          </div>
+        </Reveal>
       </section>
-      </Reveal>
-
-      <Reveal>
-      <section className="section">
-        <p className="section-eyebrow">Follow {config.handle}</p>
-        <h2 className="section-title">Watch it happen, live and unfiltered.</h2>
-        <p className="section-copy">
-          Same handle everywhere — <strong>{config.handle}</strong> on YouTube, Kick, X, Instagram &amp; TikTok.{' '}
-          {config.slogan}
-        </p>
-        <SocialCards socials={config.socials} />
-      </section>
-      </Reveal>
     </div>
   )
 }
