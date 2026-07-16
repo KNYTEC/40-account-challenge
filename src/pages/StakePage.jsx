@@ -11,7 +11,7 @@ export default function StakePage({ stats, config }) {
 
   return (
     <div className="page">
-      <h1 className="page-title">The stake — full transparency</h1>
+      <h1 className="page-title">Costs — full transparency</h1>
       <p className="page-sub">
         {investment.description}. Every dollar that went in, every dollar that comes out, in the open.
       </p>

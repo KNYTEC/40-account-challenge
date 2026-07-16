@@ -9,8 +9,9 @@
   --grid: #e1e0d9;
   --baseline: #c3c2b7;
   --border: rgba(11, 11, 11, 0.1);
-  --accent: #2a78d6;
-  --accent-track: #cde2fb;
+  --accent: #dc2626;
+  --accent-2: #f97316;
+  --accent-track: #fbdadd;
   --good: #0ca30c;
   --bad: #d03b3b;
   --good-text: #006300;
@@ -33,14 +34,15 @@
     --grid: #2c2c2a;
     --baseline: #383835;
     --border: rgba(255, 255, 255, 0.1);
-    --accent: #3987e5;
-    --accent-track: #0d366b;
-    --good: #0ca30c;
-    --bad: #d03b3b;
-    --good-text: #0ca30c;
-    --bad-text: #e66767;
-    --good-wash: rgba(12, 163, 12, 0.12);
-    --bad-wash: rgba(208, 59, 59, 0.12);
+    --accent: #f5424f;
+    --accent-2: #fb8a3c;
+    --accent-track: #3d1519;
+    --good: #16b021;
+    --bad: #ef4444;
+    --good-text: #2fbe37;
+    --bad-text: #f5555f;
+    --good-wash: rgba(22, 176, 33, 0.13);
+    --bad-wash: rgba(239, 68, 68, 0.14);
     --tooltip-bg: #fcfcfb;
     --tooltip-ink: #0b0b0b;
     --tooltip-ink-2: #52514e;
@@ -57,14 +59,15 @@
   --grid: #2c2c2a;
   --baseline: #383835;
   --border: rgba(255, 255, 255, 0.1);
-  --accent: #3987e5;
-  --accent-track: #0d366b;
-  --good: #0ca30c;
-  --bad: #d03b3b;
-  --good-text: #0ca30c;
-  --bad-text: #e66767;
-  --good-wash: rgba(12, 163, 12, 0.12);
-  --bad-wash: rgba(208, 59, 59, 0.12);
+  --accent: #f5424f;
+  --accent-2: #fb8a3c;
+  --accent-track: #3d1519;
+  --good: #16b021;
+  --bad: #ef4444;
+  --good-text: #2fbe37;
+  --bad-text: #f5555f;
+  --good-wash: rgba(22, 176, 33, 0.13);
+  --bad-wash: rgba(239, 68, 68, 0.14);
   --tooltip-bg: #fcfcfb;
   --tooltip-ink: #0b0b0b;
   --tooltip-ink-2: #52514e;
@@ -788,7 +791,7 @@ body {
   letter-spacing: -0.015em;
   line-height: 1.15;
   margin: 0 0 6px;
-  background: linear-gradient(100deg, var(--accent), var(--good));
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -896,7 +899,7 @@ body {
   line-height: 0.86;
   letter-spacing: -0.04em;
   margin: 0;
-  background: linear-gradient(100deg, var(--accent), var(--good));
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -975,7 +978,7 @@ body {
   inset: 0 auto 0 0;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent), var(--good));
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
   transition: width 500ms ease;
 }
 

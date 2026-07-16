@@ -151,11 +151,11 @@ export function CumulativeChart({ rows }) {
               {shortDate(rows[i].date)}
             </text>
           ))}
-          <path d={area} fill="var(--accent)" opacity="0.1" />
+          <path d={area} fill="var(--good)" opacity="0.1" />
           <path
             d={line}
             fill="none"
-            stroke="var(--accent)"
+            stroke="var(--good)"
             strokeWidth="2"
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -170,14 +170,14 @@ export function CumulativeChart({ rows }) {
                 stroke="var(--baseline)"
                 strokeWidth="1"
               />
-              <circle cx={pts[hi][0]} cy={pts[hi][1]} r="5" fill="var(--accent)" stroke="var(--surface)" strokeWidth="2" />
+              <circle cx={pts[hi][0]} cy={pts[hi][1]} r="5" fill="var(--good)" stroke="var(--surface)" strokeWidth="2" />
             </>
           )}
           <circle
             cx={pts[n - 1][0]}
             cy={pts[n - 1][1]}
             r="4.5"
-            fill="var(--accent)"
+            fill="var(--good)"
             stroke="var(--surface)"
             strokeWidth="2"
           />
@@ -192,7 +192,7 @@ export function CumulativeChart({ rows }) {
             width={width}
             date={`${longDate(rows[hi].date)} — day ${rows[hi].day}`}
             rows={[
-              { label: 'cumulative (×40)', value: money(rows[hi].cumTotal), color: 'var(--accent)' },
+              { label: 'cumulative (×40)', value: money(rows[hi].cumTotal), color: 'var(--good)' },
               {
                 label: 'that day (×40)',
                 value: signedMoney(rows[hi].dailyTotal),

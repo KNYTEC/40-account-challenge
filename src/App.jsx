@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { BrowserRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import config from './data/config.json'
 import realEntries from './data/entries.json'
 import demoEntries from './data/demoEntries.json'
@@ -14,7 +14,7 @@ const TITLES = {
   '/': '35 Winning Days to $100K',
   '/calendar': 'Daily P&L Calendar',
   '/stats': 'Full Stats & Charts',
-  '/stake': 'The Stake',
+  '/costs': 'Costs',
 }
 
 function currentTheme() {
@@ -69,7 +69,7 @@ function Shell() {
             </NavLink>
             <NavLink to={`/calendar${search}`}>Calendar</NavLink>
             <NavLink to={`/stats${search}`}>Stats</NavLink>
-            <NavLink to={`/stake${search}`}>The Stake</NavLink>
+            <NavLink to={`/costs${search}`}>Costs</NavLink>
           </nav>
           <div className="header-right">
             <SocialIcons socials={config.socials} />
@@ -91,7 +91,8 @@ function Shell() {
           <Route path="/" element={<Home stats={stats} milestones={milestones} callout={callout} config={config} />} />
           <Route path="/calendar" element={<CalendarPage stats={stats} config={config} />} />
           <Route path="/stats" element={<StatsPage stats={stats} config={config} />} />
-          <Route path="/stake" element={<StakePage stats={stats} config={config} />} />
+          <Route path="/costs" element={<StakePage stats={stats} config={config} />} />
+          <Route path="/stake" element={<Navigate to={`/costs${search}`} replace />} />
           <Route
             path="*"
             element={<Home stats={stats} milestones={milestones} callout={callout} config={config} />}
@@ -115,7 +116,7 @@ function Shell() {
             <Link to={`/${search}`}>Live status</Link>
             <Link to={`/calendar${search}`}>Daily P&L calendar</Link>
             <Link to={`/stats${search}`}>Full stats & charts</Link>
-            <Link to={`/stake${search}`}>The stake</Link>
+            <Link to={`/costs${search}`}>Costs</Link>
           </div>
           <div className="foot-col">
             <p className="foot-head">Follow {config.handle}</p>

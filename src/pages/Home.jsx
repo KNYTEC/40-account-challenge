@@ -66,8 +66,8 @@ export default function Home({ stats, milestones, callout, config }) {
           <Link className="btn ghost" to={`/stats${search}`}>
             📊 Full stats & charts
           </Link>
-          <Link className="btn ghost" to={`/stake${search}`}>
-            💵 The stake
+          <Link className="btn ghost" to={`/costs${search}`}>
+            💵 Costs
           </Link>
         </div>
       </section>

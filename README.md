@@ -39,7 +39,7 @@ entry for a date wins. (Or just edit the existing line.)
   style (green/red day cells with lockout badges and month totals).
 - **`/stats`** — stat tiles, equity curve, daily results chart, and the
   full history table (the source of truth).
-- **`/stake`** — full transparency: per-firm eval cost table, cash
+- **`/costs`** — full transparency: per-firm eval cost table, cash
   in / cash out, net position, and the challenge rules.
 
 Socials are configured in `src/data/config.json` → `socials`
@@ -57,8 +57,8 @@ lockout amounts, milestone targets, baseline pace ($250/day, used for
 projections until real history exists), socials, and a `payouts` array for
 recording real withdrawals as they happen.
 
-The stake page's firm table is driven by `investment.firms` — one row per
-prop firm. The total stake shown across the site is computed from these
+The costs page's firm table is driven by `investment.firms` — one row per
+prop firm. The total cost shown across the site is computed from these
 rows, so updating them updates everything. Set `breakdownFinal: true` once
 the exact costs are in to drop the "being finalized" note:
 

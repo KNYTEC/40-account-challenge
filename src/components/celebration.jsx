@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-const CONFETTI_COLORS = ['#2a78d6', '#3987e5', '#0ca30c', '#00a000', '#eda100', '#eb6834']
+const CONFETTI_COLORS = ['#f5424f', '#dc2626', '#fb8a3c', '#f97316', '#16b021', '#ffffff']
 
 // A tiny self-contained canvas confetti burst — no external library (keeps the
 // bundle small and satisfies the no-CDN constraint). Runs ~2.4s then removes
