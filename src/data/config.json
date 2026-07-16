@@ -20,11 +20,17 @@
     "payout2WinningDaysAfter": 7
   },
   "investment": {
-    "total": 3800,
-    "description": "40 × $50K evaluation accounts",
-    "breakdownFinal": false,
+    "total": 3765,
+    "accountSize": 50000,
+    "description": "40 × $50K evaluation accounts across 5 prop firms — $2M in combined funding",
+    "breakdownFinal": true,
+    "pricingNote": "Tradeify Select was bought as a $470 5-pack and Apex EOD as $495 × 4 (20 accounts) — those two show the effective per-eval cost; the rest are unit price × 5.",
     "firms": [
-      { "firm": "Prop firm evals — exact per-firm breakdown coming soon", "accounts": 40, "costPerAccount": 95 }
+      { "firm": "Topstep", "accountType": "$50K · No activation fee", "accounts": 5, "costPerAccount": 85 },
+      { "firm": "MyFundedFutures", "accountType": "$50K · Flex Plan", "accounts": 5, "costPerAccount": 80 },
+      { "firm": "Tradeify", "accountType": "$50K · Select", "accounts": 5, "costPerAccount": 94 },
+      { "firm": "Lucid", "accountType": "$50K · Flex", "accounts": 5, "costPerAccount": 98 },
+      { "firm": "Apex", "accountType": "$50K · EOD, no activation fee", "accounts": 20, "costPerAccount": 99 }
     ]
   },
   "payouts": [],

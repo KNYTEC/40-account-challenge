@@ -7,6 +7,7 @@ export default function StakePage({ stats, config }) {
   const withdrawn = payouts.reduce((s, p) => s + p.amount, 0)
   const net = withdrawn - total
   const totalAccounts = (investment.firms || []).reduce((s, f) => s + f.accounts, 0)
+  const combinedFunding = totalAccounts * (investment.accountSize || 0)
 
   return (
     <div className="page">
@@ -16,6 +17,22 @@ export default function StakePage({ stats, config }) {
       </p>
 
       <div className="stack">
+        {combinedFunding > 0 && (
+          <div className="funding-flex">
+            <div className="ff-item">
+              <p className="ff-num">{money(combinedFunding)}</p>
+              <p className="ff-label">in combined funding controlled</p>
+            </div>
+            <p className="ff-arrow" aria-hidden="true">
+              for a stake of
+            </p>
+            <div className="ff-item">
+              <p className="ff-num accent">{money(total)}</p>
+              <p className="ff-label">total cost of all {totalAccounts} evals</p>
+            </div>
+          </div>
+        )}
+
         <div className="card">
           <h2>Where the {money(total)} went</h2>
           <p className="card-sub">
@@ -28,6 +45,7 @@ export default function StakePage({ stats, config }) {
               <thead>
                 <tr>
                   <th>Firm</th>
+                  <th>Account type</th>
                   <th className="num">Accounts</th>
                   <th className="num">Cost per eval</th>
                   <th className="num">Total</th>
@@ -37,6 +55,7 @@ export default function StakePage({ stats, config }) {
                 {(investment.firms || []).map((f) => (
                   <tr key={f.firm}>
                     <td className="note-cell">{f.firm}</td>
+                    <td className="note-cell">{f.accountType}</td>
                     <td className="num">{f.accounts}</td>
                     <td className="num">{money(f.costPerAccount)}</td>
                     <td className="num">{money(f.accounts * f.costPerAccount)}</td>
@@ -44,6 +63,7 @@ export default function StakePage({ stats, config }) {
                 ))}
                 <tr className="total-row">
                   <td>Total</td>
+                  <td className="note-cell">{totalAccounts} × $50K accounts</td>
                   <td className="num">{totalAccounts}</td>
                   <td className="num" />
                   <td className="num">{money(total)}</td>
@@ -51,6 +71,7 @@ export default function StakePage({ stats, config }) {
               </tbody>
             </table>
           </div>
+          {investment.pricingNote && <p className="firms-note">{investment.pricingNote}</p>}
         </div>
 
         <div className="grid-2">

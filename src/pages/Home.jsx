@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { addBusinessDays, money, monthDay, signedMoney } from '../lib/format'
+import { addBusinessDays, compactMoney, money, monthDay, signedMoney } from '../lib/format'
 import { computeCountdown, investmentTotal } from '../lib/stats.js'
 import { Callout, Milestones } from '../components/panels.jsx'
 import { SocialCards } from '../components/social.jsx'
@@ -150,7 +150,10 @@ export default function Home({ stats, milestones, callout, config }) {
         <div className="fact-row">
           <div className="fact">
             <p className="fact-num">{config.accounts}</p>
-            <p className="fact-label">$50K eval accounts running in parallel</p>
+            <p className="fact-label">
+              × $50K accounts in parallel — {compactMoney(config.accounts * (config.investment.accountSize || 0))} in
+              combined funding
+            </p>
           </div>
           <div className="fact">
             <p className="fact-num">{money(investmentTotal(config))}</p>

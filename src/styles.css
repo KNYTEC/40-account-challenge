@@ -1395,7 +1395,60 @@ body {
 }
 
 .h-table.firms-table {
-  min-width: 480px;
+  min-width: 560px;
+}
+
+.firms-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 12px 0 0;
+  line-height: 1.55;
+}
+
+/* funding-vs-stake highlight on the stake page */
+.funding-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.ff-item {
+  min-width: 0;
+}
+
+.ff-num {
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1;
+}
+
+.ff-num.accent {
+  color: var(--accent);
+}
+
+.ff-label {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 6px 0 0;
+}
+
+.ff-arrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 650;
+  margin: 0;
+  white-space: nowrap;
 }
 
 /* ---------- site footer ---------- */
