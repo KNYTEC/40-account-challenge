@@ -207,7 +207,8 @@ export default function Home({ stats, milestones, callout, config }) {
         <p className="section-eyebrow">Follow {config.handle}</p>
         <h2 className="section-title">Watch it happen, live and unfiltered.</h2>
         <p className="section-copy">
-          Same handle everywhere — <strong>{config.handle}</strong> on YouTube and Instagram. {config.slogan}
+          Same handle everywhere — <strong>{config.handle}</strong> on YouTube, Kick, X, Instagram &amp; TikTok.{' '}
+          {config.slogan}
         </p>
         <SocialCards socials={config.socials} />
       </section>

@@ -4,7 +4,7 @@ import config from './data/config.json'
 import realEntries from './data/entries.json'
 import demoEntries from './data/demoEntries.json'
 import { computeCallout, computeMilestones, computeStats } from './lib/stats.js'
-import { SocialIcons } from './components/social.jsx'
+import { SocialIcons, socialList } from './components/social.jsx'
 import Home from './pages/Home.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
 import StatsPage from './pages/StatsPage.jsx'
@@ -119,12 +119,11 @@ function Shell() {
           </div>
           <div className="foot-col">
             <p className="foot-head">Follow {config.handle}</p>
-            <a href={config.socials.youtube} target="_blank" rel="noreferrer">
-              YouTube — trade recaps
-            </a>
-            <a href={config.socials.instagram} target="_blank" rel="noreferrer">
-              Instagram — behind the scenes
-            </a>
+            {socialList(config.socials).map((s) => (
+              <a key={s.key} href={config.socials[s.key]} target="_blank" rel="noreferrer">
+                {s.label} — {s.short}
+              </a>
+            ))}
           </div>
         </div>
       </footer>

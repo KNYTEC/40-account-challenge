@@ -183,7 +183,7 @@ body {
 .social-icon {
   color: var(--text-secondary);
   display: inline-flex;
-  padding: 8px;
+  padding: 6px;
   border-radius: 999px;
   line-height: 0;
 }
@@ -1205,9 +1205,9 @@ body {
 /* ---------- social cards ---------- */
 .social-cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 16px;
-  max-width: 760px;
+  max-width: 940px;
   margin: 24px auto 0;
 }
 
@@ -1232,17 +1232,8 @@ body {
   display: flex;
   padding: 11px;
   border-radius: 12px;
-  color: #fff;
   flex-shrink: 0;
   line-height: 0;
-}
-
-.social-card.yt .sc-icon {
-  background: #e01e2f;
-}
-
-.social-card.ig .sc-icon {
-  background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
 }
 
 .sc-name {
