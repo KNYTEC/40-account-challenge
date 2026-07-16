@@ -800,8 +800,9 @@ body {
   font-size: clamp(26px, 4.5vw, 42px);
   font-weight: 750;
   letter-spacing: -0.015em;
-  line-height: 1.15;
-  margin: 0 0 6px;
+  line-height: 1.25;
+  padding-bottom: 0.14em;
+  margin: 0 0 4px;
   background: linear-gradient(100deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
