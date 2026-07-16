@@ -24,6 +24,18 @@ export function Constellation({ accounts = 40, winLockout = 250, lossLockout = 1
     let nodes = []
     let maxDist = 1
 
+    // In reduced-motion mode there is no animation loop, so anything that
+    // resizes (and therefore wipes) the canvas must schedule one repaint.
+    let staticQueued = false
+    const renderOnce = () => {
+      if (!reduced || staticQueued) return
+      staticQueued = true
+      requestAnimationFrame(() => {
+        staticQueued = false
+        draw()
+      })
+    }
+
     const layout = () => {
       W = wrap.clientWidth
       H = W < 560 ? 340 : 430
@@ -42,10 +54,12 @@ export function Constellation({ accounts = 40, winLockout = 250, lossLockout = 1
           by: cy + Math.sin(th) * r * 0.66,
           tw: Math.random() * Math.PI * 2,
           energy: 0,
-          color: '245, 66, 79',
+          // reduced-motion gets a lit "all synced" static frame by default
+          color: reduced ? '22, 176, 33' : '245, 66, 79',
         }
       })
       maxDist = nodes.reduce((m, n) => Math.max(m, Math.hypot(n.bx - cx, n.by - cy)), 1)
+      renderOnce()
     }
     layout()
     const ro = new ResizeObserver(layout)
@@ -77,7 +91,17 @@ export function Constellation({ accounts = 40, winLockout = 250, lossLockout = 1
           : `LAST SYNC: LOSS LOCK −$${lossLockout} × ${accounts}`,
       }
     }
-    const onDown = () => fire()
+    const onDown = () => {
+      fire()
+      if (reduced) {
+        // no animation loop — flash the result as one discrete repaint
+        for (const n of nodes) {
+          n.energy = 1
+          n.color = pulse.win ? '22, 176, 33' : '239, 68, 68'
+        }
+        renderOnce()
+      }
+    }
     canvas.addEventListener('pointerdown', onDown)
     let interval = 0
     if (!reduced) {
@@ -150,9 +174,9 @@ export function Constellation({ accounts = 40, winLockout = 250, lossLockout = 1
 
       // account nodes
       for (const n of nodes) {
-        const e = reduced ? 0.5 : n.energy
+        const e = reduced ? Math.max(0.5, n.energy) : n.energy
         const r = 3 + e * 2.5 + n.hover * 1.5
-        const col = reduced ? '22, 176, 33' : e > 0.05 ? n.color : '245, 66, 79'
+        const col = e > 0.05 ? n.color : '245, 66, 79'
         if (e > 0.15 || n.hover > 0.2) {
           const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 5)
           g.addColorStop(0, `rgba(${col}, ${0.22 * Math.max(e, n.hover)})`)
@@ -187,14 +211,15 @@ export function Constellation({ accounts = 40, winLockout = 250, lossLockout = 1
       ctx.arc(cx, cy, 11 + hubPulse * 2, 0, Math.PI * 2)
       ctx.stroke()
 
-      // HUD text
+      // HUD text (stacked on narrow canvases so the two lines never collide)
+      const narrow = W < 560
       ctx.font = '600 10px ui-monospace, SFMono-Regular, Menlo, monospace'
       ctx.fillStyle = 'rgba(137, 135, 129, 0.9)'
       ctx.textAlign = 'left'
-      ctx.fillText(`SYNC ${accounts}/${accounts} ACCOUNTS · LIVE`, 12, H - 14)
-      ctx.textAlign = 'right'
+      ctx.fillText(`SYNC ${accounts}/${accounts} ACCOUNTS · LIVE`, 12, narrow ? H - 28 : H - 14)
+      ctx.textAlign = narrow ? 'left' : 'right'
       ctx.fillStyle = lastResult.win ? 'rgba(47, 190, 55, 0.95)' : 'rgba(245, 85, 95, 0.95)'
-      ctx.fillText(lastResult.label, W - 12, H - 14)
+      ctx.fillText(lastResult.label, narrow ? 12 : W - 12, H - 14)
 
       if (reduced) return
       raf = requestAnimationFrame(draw)

@@ -22,6 +22,9 @@ export function Backdrop() {
       canvas.width = W * dpr
       canvas.height = H * dpr
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      // resizing wipes the canvas; with no animation loop under reduced
+      // motion, repaint the static frame once
+      if (reduced) requestAnimationFrame(() => draw())
     }
     resize()
     window.addEventListener('resize', resize)
