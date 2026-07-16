@@ -4,6 +4,10 @@ import { computeCountdown, investmentTotal } from '../lib/stats.js'
 import { Callout, Milestones } from '../components/panels.jsx'
 import { SocialCards } from '../components/social.jsx'
 import { WinCelebration } from '../components/celebration.jsx'
+import { CountUp } from '../components/fx/CountUp.jsx'
+import { Reveal } from '../components/fx/Reveal.jsx'
+import { Ticker } from '../components/fx/Ticker.jsx'
+import { Constellation } from '../components/fx/Constellation.jsx'
 
 function statusOf(stats) {
   const { latest } = stats
@@ -30,9 +34,22 @@ export default function Home({ stats, milestones, callout, config }) {
     : monthDay(addBusinessDays(now, countdown.payout1.winningDaysLeft))
   const payoutFullDate = countdown.unlocked ? null : monthDay(addBusinessDays(now, countdown.winningDays))
 
+  const tickerItems = [
+    `${config.accounts} accounts synced`,
+    `Day ${stats.daysTraded}`,
+    `${signedMoney(cumTotal)} total P&L`,
+    `${countdown.winningDays} winning days to $100K`,
+    `Win lock +$${config.rules.dailyWinLockout}`,
+    `Loss lock −$${Math.abs(config.rules.dailyLossLockout)}`,
+    '$2M in funding',
+    `${config.handle} everywhere`,
+    config.slogan,
+  ]
+
   return (
     <div className="home">
       <WinCelebration latest={latest} countdown={countdown} stats={stats} />
+      <Ticker items={tickerItems} />
       <section className="hero-status">
         <div className={`hero-glow ${glow}`} aria-hidden="true" />
         <p className="hero-kicker">
@@ -41,10 +58,16 @@ export default function Home({ stats, milestones, callout, config }) {
           <span className="hk-slogan">{config.slogan}</span>
         </p>
         <p className="eyebrow">
-          Day {stats.daysTraded} · Status: {status.word} {status.emoji}
+          Day {stats.daysTraded} · Status:{' '}
+          <span className="glitch" data-text={status.word}>
+            {status.word}
+          </span>{' '}
+          {status.emoji}
         </p>
         <h1 className="hero-title">{config.tagline}</h1>
-        <p className="mega-figure">{signedMoney(cumTotal)}</p>
+        <p className="mega-figure">
+          <CountUp value={cumTotal} format={(v) => signedMoney(v)} duration={1400} />
+        </p>
         <p className="hero-sub">
           Total P&L across all {config.accounts} accounts
           {latest && (
@@ -85,7 +108,13 @@ export default function Home({ stats, milestones, callout, config }) {
         ) : (
           <div className="cd-inner">
             <p className="cd-kick">The countdown</p>
-            <p className="cd-num">{countdown.winningDays}</p>
+            <p className="cd-num">
+              <CountUp
+                value={countdown.totalWinningDays - countdown.winningDays}
+                format={(v) => countdown.totalWinningDays - Math.round(v)}
+                duration={1600}
+              />
+            </p>
             <p className="cd-label">winning days to {money(countdown.withdrawalTotal)} in payouts</p>
 
             <div className="cd-bar" aria-hidden="true">
@@ -138,6 +167,25 @@ export default function Home({ stats, milestones, callout, config }) {
         )}
       </section>
 
+      <Reveal>
+        <section className="section">
+          <p className="section-eyebrow">The engine</p>
+          <h2 className="section-title">One trade. Forty accounts. Zero hesitation.</h2>
+          <p className="section-copy">
+            Every order fires from one account and hits all {config.accounts} at once via {config.copyTrader}. Watch
+            it happen — or tap the grid to fire one yourself.
+          </p>
+          <div className="card constellation-card">
+            <Constellation
+              accounts={config.accounts}
+              winLockout={config.rules.dailyWinLockout}
+              lossLockout={Math.abs(config.rules.dailyLossLockout)}
+            />
+          </div>
+        </section>
+      </Reveal>
+
+      <Reveal>
       <section className="section">
         <p className="section-eyebrow">The mission</p>
         <h2 className="section-title">One trader. Forty accounts. Zero secrets.</h2>
@@ -149,23 +197,31 @@ export default function Home({ stats, milestones, callout, config }) {
         </p>
         <div className="fact-row">
           <div className="fact">
-            <p className="fact-num">{config.accounts}</p>
+            <p className="fact-num">
+              <CountUp value={config.accounts} />
+            </p>
             <p className="fact-label">
               × $50K accounts in parallel — {compactMoney(config.accounts * (config.investment.accountSize || 0))} in
               combined funding
             </p>
           </div>
           <div className="fact">
-            <p className="fact-num">{money(investmentTotal(config))}</p>
+            <p className="fact-num">
+              <CountUp value={investmentTotal(config)} format={(v) => money(v)} />
+            </p>
             <p className="fact-label">Total stake — all-in cost of every eval</p>
           </div>
           <div className="fact">
-            <p className="fact-num">{money(countdown.withdrawalTotal)}</p>
+            <p className="fact-num">
+              <CountUp value={countdown.withdrawalTotal} format={(v) => money(v)} />
+            </p>
             <p className="fact-label">Total payout target — two cycles across all accounts</p>
           </div>
         </div>
       </section>
+      </Reveal>
 
+      <Reveal>
       <section className="section">
         <p className="section-eyebrow">The rules of the game</p>
         <h2 className="section-title">Discipline is the whole strategy.</h2>
@@ -196,13 +252,17 @@ export default function Home({ stats, milestones, callout, config }) {
           </div>
         </div>
       </section>
+      </Reveal>
 
+      <Reveal>
       <section className="section">
         <p className="section-eyebrow">The roadmap</p>
         <h2 className="section-title">Three checkpoints to {money(countdown.withdrawalTotal)} in payouts.</h2>
         <Milestones milestones={milestones} stats={stats} />
       </section>
+      </Reveal>
 
+      <Reveal>
       <section className="section">
         <p className="section-eyebrow">Follow {config.handle}</p>
         <h2 className="section-title">Watch it happen, live and unfiltered.</h2>
@@ -212,6 +272,7 @@ export default function Home({ stats, milestones, callout, config }) {
         </p>
         <SocialCards socials={config.socials} />
       </section>
+      </Reveal>
     </div>
   )
 }

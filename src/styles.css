@@ -1534,3 +1534,272 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================== FX layer (neon terminal) ==================== */
+
+.fx-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+:root[data-theme='light'] .fx-backdrop {
+  display: none;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:where(:not([data-theme='dark'])) .fx-backdrop {
+    display: none;
+  }
+}
+
+.site-header,
+main.wrap,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* glass surfaces over the animated backdrop (dark only) */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light']))
+    :is(.card, .tile, .fact, .rule-card, .social-card, .countdown, .funding-flex, .callout, .hero-kicker) {
+    background: rgba(24, 24, 23, 0.62);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+:root[data-theme='dark']
+  :is(.card, .tile, .fact, .rule-card, .social-card, .countdown, .funding-flex, .callout, .hero-kicker) {
+  background: rgba(24, 24, 23, 0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* neon hover on interactive cards */
+.card,
+.tile,
+.fact,
+.rule-card,
+.social-card {
+  transition: border-color 250ms ease, box-shadow 250ms ease, transform 250ms ease;
+}
+
+.rule-card:hover,
+.fact:hover,
+.tile:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  box-shadow: 0 0 28px rgba(245, 66, 79, 0.1);
+  transform: translateY(-2px);
+}
+
+.social-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 0 28px rgba(245, 66, 79, 0.14);
+  transform: translateY(-2px);
+}
+
+/* scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 700ms ease, transform 700ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* stat ticker */
+.ticker {
+  position: relative;
+  width: 100vw;
+  margin: 14px calc(50% - 50vw) -28px;
+  border-block: 1px solid var(--border);
+  padding: 8px 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.ticker-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+@keyframes ticker-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.ticker-sep {
+  color: var(--accent);
+  font-size: 7px;
+  margin: 0 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}
+
+/* glitch status word */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.glitch::before {
+  color: var(--accent);
+  animation: glitch-a 5.2s infinite steps(1);
+}
+
+.glitch::after {
+  color: var(--accent-2);
+  animation: glitch-b 5.2s infinite steps(1);
+}
+
+@keyframes glitch-a {
+  0%,
+  93.9%,
+  96.1%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  94% {
+    opacity: 0.85;
+    transform: translate(-2px, 1px);
+  }
+  95% {
+    opacity: 0.85;
+    transform: translate(2px, -1px);
+  }
+}
+
+@keyframes glitch-b {
+  0%,
+  94.4%,
+  96.6%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  94.5% {
+    opacity: 0.7;
+    transform: translate(2px, -1px);
+  }
+  95.5% {
+    opacity: 0.7;
+    transform: translate(-2px, 1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch::before,
+  .glitch::after {
+    animation: none;
+  }
+}
+
+/* fire shimmer on the gradient headline + countdown number */
+.hero-title,
+.cd-num {
+  background-size: 200% auto;
+  animation-name: shimmer;
+  animation-duration: 6s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.cd-num {
+  /* keep the existing pulse too */
+  animation-name: cd-pulse, shimmer;
+  animation-duration: 3.2s, 6s;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-title,
+  .cd-num {
+    animation: none;
+  }
+}
+
+/* copy-trade constellation */
+.constellation-card {
+  padding: 8px;
+  margin-top: 24px;
+  overflow: hidden;
+}
+
+.constellation {
+  position: relative;
+}
+
+.constellation canvas {
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  touch-action: manipulation;
+  border-radius: 10px;
+}
+
+.constellation-hint {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  pointer-events: none;
+}
