@@ -82,14 +82,18 @@ export function computeMilestones(stats, config) {
   const { accounts, milestones } = config
   const cum = stats.cumPerAccount
   const evalTarget = milestones.evalPassPerAccount
-  const payoutTarget = evalTarget + milestones.fundedProfitForPayout
-  const withdrawalTotal = milestones.withdrawalPerAccount * accounts
+  const payout1Target = evalTarget + milestones.fundedProfitForPayout // $7,000/acct
+  const payout2Target = payout1Target + milestones.payout2WinningDaysAfter * config.rules.dailyWinLockout // $8,750/acct
+  const payout1Total = milestones.withdrawalPerAccount * accounts // $60,000
+  const payout2Total = payout1Total + milestones.payout2PerAccount * accounts // $100,000
   const etaDays = (remaining) =>
     remaining <= 0 ? 0 : Math.ceil(remaining / stats.pace)
 
   const evalPct = clamp01(cum / evalTarget)
   const fundedProgress = Math.max(0, cum - evalTarget)
-  const payoutPct = clamp01(fundedProgress / milestones.fundedProfitForPayout)
+  const payout1Pct = clamp01(fundedProgress / milestones.fundedProfitForPayout)
+  const payout2Span = payout2Target - payout1Target
+  const payout2Pct = clamp01((cum - payout1Target) / payout2Span)
 
   return [
     {
@@ -103,24 +107,24 @@ export function computeMilestones(stats, config) {
       etaDays: etaDays(evalTarget - cum),
     },
     {
-      key: 'payout',
-      title: 'Unlock first payout',
-      subtitle: `${moneyish(milestones.fundedProfitForPayout)} funded profit per account`,
-      pct: payoutPct,
-      done: cum >= payoutTarget,
+      key: 'payout1',
+      title: 'First payout',
+      subtitle: `${moneyish(milestones.withdrawalPerAccount)} × ${accounts} accounts = ${moneyish(payout1Total)}`,
+      pct: payout1Pct,
+      done: cum >= payout1Target,
       locked: cum < evalTarget,
-      valueText: `${moneyish(Math.min(fundedProgress, milestones.fundedProfitForPayout))} of ${moneyish(milestones.fundedProfitForPayout)}`,
-      etaDays: etaDays(payoutTarget - cum),
+      valueText: `${moneyish(Math.round(payout1Pct * payout1Total))} of ${moneyish(payout1Total)} unlocked`,
+      etaDays: etaDays(payout1Target - cum),
     },
     {
-      key: 'withdrawal',
-      title: 'First withdrawal',
-      subtitle: `${moneyish(milestones.withdrawalPerAccount)} × ${accounts} accounts = ${moneyish(withdrawalTotal)}`,
-      pct: payoutPct,
-      done: cum >= payoutTarget,
-      locked: cum < evalTarget,
-      valueText: `${moneyish(Math.round(payoutPct * withdrawalTotal))} of ${moneyish(withdrawalTotal)} unlocked`,
-      etaDays: etaDays(payoutTarget - cum),
+      key: 'payout2',
+      title: 'Second payout',
+      subtitle: `+${moneyish(milestones.payout2PerAccount * accounts)} → ${moneyish(payout2Total)} total in payouts`,
+      pct: payout2Pct,
+      done: cum >= payout2Target,
+      locked: cum < payout1Target,
+      valueText: `${moneyish(payout2Total)} total · unlocks after ${milestones.payout2WinningDaysAfter} more winning days`,
+      etaDays: etaDays(payout2Target - cum),
     },
   ]
 }
@@ -135,14 +139,28 @@ export function investmentTotal(config) {
 }
 
 // The big motivational countdown: how many winning days (green days at the
-// +$250 daily max) still stand between today and the first payout / $60K.
-// Recomputes from cumulative P&L, so every new day moves it.
+// +$250 daily max) still stand between today and the FULL $100K in payouts.
+// Assumes every next day is a win. Recomputes from cumulative P&L, so every
+// new day moves it. Payout #1 ($60K) is a marker along the way.
 export function computeCountdown(stats, config) {
   const { accounts, milestones, rules } = config
-  const payoutTargetPerAccount = milestones.evalPassPerAccount + milestones.fundedProfitForPayout
-  const remaining = payoutTargetPerAccount - stats.cumPerAccount
   const winAmount = rules.dailyWinLockout
+  const cum = stats.cumPerAccount
+
+  const payout1TargetPerAccount = milestones.evalPassPerAccount + milestones.fundedProfitForPayout // $7,000
+  const payout2TargetPerAccount = payout1TargetPerAccount + milestones.payout2WinningDaysAfter * winAmount // $8,750
+
+  const remaining = payout2TargetPerAccount - cum
   const winningDays = remaining <= 0 ? 0 : Math.ceil(remaining / winAmount)
+  const totalWinningDays = Math.round(payout2TargetPerAccount / winAmount) // 35
+  const bankedWinningDays = Math.max(0, Math.min(totalWinningDays, Math.round(cum / winAmount)))
+  const progressPct = clamp01(cum / payout2TargetPerAccount)
+
+  const payout1Total = milestones.withdrawalPerAccount * accounts // $60,000
+  const payout2Total = payout1Total + milestones.payout2PerAccount * accounts // $100,000
+  const payout1RemainingPerAccount = Math.max(0, payout1TargetPerAccount - cum)
+  const payout1WinningDaysLeft =
+    payout1RemainingPerAccount <= 0 ? 0 : Math.ceil(payout1RemainingPerAccount / winAmount)
 
   // How much a single winning day just moved the counter — for the "−1 today"
   // style motivation. Positive when the latest day was green.
@@ -151,12 +169,21 @@ export function computeCountdown(stats, config) {
 
   return {
     unlocked: remaining <= 0,
-    winningDays,
+    winningDays, // to the full $100K
     winAmount,
-    withdrawalTotal: milestones.withdrawalPerAccount * accounts,
+    totalWinningDays, // 35
+    bankedWinningDays,
+    progressPct,
+    withdrawalTotal: payout2Total, // full $100K
     remainingPerAccount: Math.max(0, remaining),
     movedToday,
-    evalPassed: stats.cumPerAccount >= milestones.evalPassPerAccount,
+    evalPassed: cum >= milestones.evalPassPerAccount,
+    payout1: {
+      total: payout1Total,
+      unlocked: cum >= payout1TargetPerAccount,
+      winningDaysLeft: payout1WinningDaysLeft,
+      pctOfBar: clamp01(payout1TargetPerAccount / payout2TargetPerAccount), // ~0.8 marker on the bar
+    },
   }
 }
 

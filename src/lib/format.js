@@ -50,6 +50,22 @@ export function shortDate(iso) {
   })
 }
 
+// Add N business days (skip Sat/Sun) to a date, returning a new Date.
+export function addBusinessDays(date, n) {
+  const d = new Date(date.getTime())
+  let added = 0
+  while (added < n) {
+    d.setDate(d.getDate() + 1)
+    const dow = d.getDay()
+    if (dow !== 0 && dow !== 6) added++
+  }
+  return d
+}
+
+export function monthDay(date) {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 export function days(v) {
   if (v < 0.05) return 'less than a tenth of a day'
   const r = Math.round(v * 10) / 10

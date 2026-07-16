@@ -1,6 +1,6 @@
 {
   "challengeName": "40 Account Challenge",
-  "tagline": "$60K in 30 days. With prop firms.",
+  "tagline": "35 winning days. $100K in payouts.",
   "series": "MNQDegen",
   "brand": "MNQDegen",
   "handle": "@mnqdegen",
@@ -15,7 +15,9 @@
   "milestones": {
     "evalPassPerAccount": 3000,
     "fundedProfitForPayout": 4000,
-    "withdrawalPerAccount": 1500
+    "withdrawalPerAccount": 1500,
+    "payout2PerAccount": 1000,
+    "payout2WinningDaysAfter": 7
   },
   "investment": {
     "total": 3800,

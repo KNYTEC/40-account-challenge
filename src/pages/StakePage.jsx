@@ -56,12 +56,23 @@ export default function StakePage({ stats, config }) {
         <div className="grid-2">
           <div className="card">
             <h2>Cash in, cash out</h2>
-            <p className="card-sub">The only numbers that matter at the end of the story.</p>
+            <p className="card-sub">
+              The only numbers that matter at the end of the story. Target: two payout cycles ={' '}
+              {money((config.milestones.withdrawalPerAccount + config.milestones.payout2PerAccount) * accounts)}.
+            </p>
             <table className="t-table">
               <tbody>
                 <tr>
                   <td className="muted-cell">Initial investment</td>
                   <td>−{money(total)}</td>
+                </tr>
+                <tr>
+                  <td className="muted-cell">Payout #1 target ({money(config.milestones.withdrawalPerAccount)} × {accounts})</td>
+                  <td>{money(config.milestones.withdrawalPerAccount * accounts)}</td>
+                </tr>
+                <tr>
+                  <td className="muted-cell">Payout #2 target ({money(config.milestones.payout2PerAccount)} × {accounts})</td>
+                  <td>{money(config.milestones.payout2PerAccount * accounts)}</td>
                 </tr>
                 <tr>
                   <td className="muted-cell">Withdrawn to date</td>

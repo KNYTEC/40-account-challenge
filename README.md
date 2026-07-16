@@ -1,12 +1,17 @@
-# 40 Account Challenge — Live P&L Dashboard
+# MNQDegen — 40 Account Challenge
+
+**Live at [mnqdegen.com](https://mnqdegen.com)** — the home of MNQDegen's
+trading challenge (and anything else built later).
 
 Public, manually updated P&L tracker for the MNQDegen 40 Account Challenge:
 one trader running 40 prop firm evaluations in parallel, copying the same
 trades to every account, with hard daily lockouts (+$250 win / −$100 loss
-per account, per day).
+per account, per day). The mission: **35 winning days → $100K in payouts**,
+degenerate with discipline.
 
 **There is no API and no backend.** The daily result is entered by hand into
-a JSON file in this repo. Every push redeploys the site on Vercel.
+a JSON file in this repo. Every push to `main` auto-deploys on Vercel and
+updates mnqdegen.com.
 
 ## How a daily update works
 

@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
-import { money, signedMoney } from '../lib/format'
+import { addBusinessDays, money, monthDay, signedMoney } from '../lib/format'
 import { computeCountdown, investmentTotal } from '../lib/stats.js'
 import { Callout, Milestones } from '../components/panels.jsx'
 import { SocialCards } from '../components/social.jsx'
+import { WinCelebration } from '../components/celebration.jsx'
 
 function statusOf(stats) {
   const { latest } = stats
@@ -21,8 +22,17 @@ export default function Home({ stats, milestones, callout, config }) {
   const glow = cumTotal > 0 ? 'good' : cumTotal < 0 ? 'bad' : 'accent'
   const countdown = computeCountdown(stats, config)
 
+  // Estimated payout dates, assuming every next day is a win (matches the
+  // countdown model). Business days only. Computed at view time in the browser.
+  const now = new Date()
+  const payout1Date = countdown.payout1.unlocked
+    ? null
+    : monthDay(addBusinessDays(now, countdown.payout1.winningDaysLeft))
+  const payoutFullDate = countdown.unlocked ? null : monthDay(addBusinessDays(now, countdown.winningDays))
+
   return (
     <div className="home">
+      <WinCelebration latest={latest} countdown={countdown} stats={stats} />
       <section className="hero-status">
         <div className={`hero-glow ${glow}`} aria-hidden="true" />
         <p className="hero-kicker">
@@ -76,18 +86,52 @@ export default function Home({ stats, milestones, callout, config }) {
           <div className="cd-inner">
             <p className="cd-kick">The countdown</p>
             <p className="cd-num">{countdown.winningDays}</p>
-            <p className="cd-label">
-              winning days to your first {money(countdown.withdrawalTotal)}
+            <p className="cd-label">winning days to {money(countdown.withdrawalTotal)} in payouts</p>
+
+            <div className="cd-bar" aria-hidden="true">
+              <span className="cd-bar-end">🚩</span>
+              <span className="cd-bar-track">
+                <span className="cd-bar-fill" style={{ width: `${Math.round(countdown.progressPct * 1000) / 10}%` }} />
+                <span
+                  className={`cd-bar-marker ${countdown.payout1.unlocked ? 'hit' : ''}`}
+                  style={{ left: `${Math.round(countdown.payout1.pctOfBar * 1000) / 10}%` }}
+                >
+                  <span className="cd-marker-label">{money(countdown.payout1.total)}</span>
+                </span>
+              </span>
+              <span className="cd-bar-end">🏆</span>
+            </div>
+            <p className="cd-bar-caption">
+              {countdown.bankedWinningDays} / {countdown.totalWinningDays} winning days · {countdown.winningDays} to go
             </p>
+
             <p className="cd-sub">
               {countdown.evalPassed ? 'Eval passed — funded and counting. ' : ''}
-              At +{money(countdown.winAmount)} a day, that's all that stands between here and the payout. Every green
-              day ticks it down; every −{money(Math.abs(config.rules.dailyLossLockout))} day pushes it back.
+              Assuming every next day is a +{money(countdown.winAmount)} win. Every green day ticks it down; every
+              −{money(Math.abs(config.rules.dailyLossLockout))} day pushes it back.
               {latest && latest.pnl > 0 && (
                 <>
                   {' '}
-                  <span className="cd-moved">Yesterday moved it −{(Math.round(countdown.movedToday * 10) / 10)}.</span>
+                  <span className="cd-moved">Yesterday moved it −{Math.round(countdown.movedToday * 10) / 10}.</span>
                 </>
+              )}
+            </p>
+
+            <p className="cd-dates">
+              If you win every day from here:
+              {payout1Date && (
+                <>
+                  {' '}
+                  <span className="cd-date-item">
+                    first {money(countdown.payout1.total)} <strong>~{payout1Date}</strong>
+                  </span>
+                </>
+              )}
+              {payout1Date && payoutFullDate && <span className="cd-date-sep"> · </span>}
+              {payoutFullDate && (
+                <span className="cd-date-item">
+                  full {money(countdown.withdrawalTotal)} <strong>~{payoutFullDate}</strong>
+                </span>
               )}
             </p>
           </div>
@@ -113,8 +157,8 @@ export default function Home({ stats, milestones, callout, config }) {
             <p className="fact-label">Total stake — all-in cost of every eval</p>
           </div>
           <div className="fact">
-            <p className="fact-num">{money(config.milestones.withdrawalPerAccount * config.accounts)}</p>
-            <p className="fact-label">First withdrawal target across all accounts</p>
+            <p className="fact-num">{money(countdown.withdrawalTotal)}</p>
+            <p className="fact-label">Total payout target — two cycles across all accounts</p>
           </div>
         </div>
       </section>
@@ -152,7 +196,7 @@ export default function Home({ stats, milestones, callout, config }) {
 
       <section className="section">
         <p className="section-eyebrow">The roadmap</p>
-        <h2 className="section-title">Three checkpoints to the first {money(config.milestones.withdrawalPerAccount * config.accounts)}.</h2>
+        <h2 className="section-title">Three checkpoints to {money(countdown.withdrawalTotal)} in payouts.</h2>
         <Milestones milestones={milestones} stats={stats} />
       </section>
 
