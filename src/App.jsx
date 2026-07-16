@@ -5,6 +5,7 @@ import realEntries from './data/entries.json'
 import demoEntries from './data/demoEntries.json'
 import { computeCallout, computeMilestones, computeStats } from './lib/stats.js'
 import { SocialIcons, socialList } from './components/social.jsx'
+import { Avatar } from './components/avatar.jsx'
 import Home from './pages/Home.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
 import StatsPage from './pages/StatsPage.jsx'
@@ -57,6 +58,7 @@ function Shell() {
       <header className="site-header">
         <div className="site-header-inner">
           <Link className="brand" to={`/${search}`}>
+            <Avatar src={config.avatar} alt={config.brand} className="brand-avatar" />
             <span className="brand-text">
               <span className="brand-name">{config.brand}</span>
               <span className="brand-tag">{config.slogan}</span>
@@ -102,6 +104,7 @@ function Shell() {
       <footer className="site-footer">
         <div className="site-footer-inner">
           <div className="foot-col">
+            <Avatar src={config.avatar} alt={config.brand} className="foot-avatar" />
             <p className="foot-wordmark">{config.brand}</p>
             <p className="foot-slogan">{config.slogan}</p>
             <p className="foot-copy">
