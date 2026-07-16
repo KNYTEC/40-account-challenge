@@ -83,7 +83,9 @@ export function computeMilestones(stats, config) {
   const cum = stats.cumPerAccount
   const evalTarget = milestones.evalPassPerAccount
   const payout1Target = evalTarget + milestones.fundedProfitForPayout // $7,000/acct
-  const payout2Target = payout1Target + milestones.payout2WinningDaysAfter * config.rules.dailyWinLockout // $8,750/acct
+  // Payout #1 withdraws $1,500/acct (balance $4,000 → $2,500); payout #2 fires
+  // when the account rebuilds to the same $4,000 — i.e. the withdrawn amount.
+  const payout2Target = payout1Target + milestones.withdrawalPerAccount // $8,500/acct
   const payout1Total = milestones.withdrawalPerAccount * accounts // $60,000
   const payout2Total = payout1Total + milestones.payout2PerAccount * accounts // $100,000
   const etaDays = (remaining) =>
@@ -141,11 +143,11 @@ export function computeMilestones(stats, config) {
     {
       key: 'payout2',
       title: 'Second payout',
-      subtitle: `+${moneyish(milestones.payout2PerAccount * accounts)} → ${moneyish(payout2Total)} total in payouts`,
+      subtitle: `rebuild ${moneyish(milestones.fundedProfitForPayout - milestones.withdrawalPerAccount)} → ${moneyish(milestones.fundedProfitForPayout)} per account · +${moneyish(milestones.payout2PerAccount * accounts)} → ${moneyish(payout2Total)} total`,
       pct: payout2Pct,
       done: cum >= payout2Target,
       locked: cum < payout1Target,
-      valueText: `${moneyish(payout2Total)} total · unlocks after ${milestones.payout2WinningDaysAfter} more winning days`,
+      valueText: `${moneyish(payout2Total)} total · unlocks after ${Math.round(milestones.withdrawalPerAccount / config.rules.dailyWinLockout)} more winning days`,
       etaDays: etaDays(payout2Target - cum),
     },
   ]
@@ -170,7 +172,8 @@ export function computeCountdown(stats, config) {
   const cum = stats.cumPerAccount
 
   const payout1TargetPerAccount = milestones.evalPassPerAccount + milestones.fundedProfitForPayout // $7,000
-  const payout2TargetPerAccount = payout1TargetPerAccount + milestones.payout2WinningDaysAfter * winAmount // $8,750
+  // after withdrawing $1,500/acct the balance rebuilds to the same $4,000 gate
+  const payout2TargetPerAccount = payout1TargetPerAccount + milestones.withdrawalPerAccount // $8,500
 
   const remaining = payout2TargetPerAccount - cum
   const winningDays = remaining <= 0 ? 0 : Math.ceil(remaining / winAmount)

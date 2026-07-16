@@ -1,6 +1,6 @@
 {
   "challengeName": "40 Account Challenge",
-  "tagline": "35 winning days. $100K in payouts.",
+  "tagline": "34 winning days. $100K in payouts.",
   "series": "MNQDegen",
   "brand": "MNQDegen",
   "handle": "@mnqdegen",
@@ -19,8 +19,7 @@
     "bufferPerAccount": 2000,
     "fundedProfitForPayout": 4000,
     "withdrawalPerAccount": 1500,
-    "payout2PerAccount": 1000,
-    "payout2WinningDaysAfter": 7
+    "payout2PerAccount": 1000
   },
   "investment": {
     "total": 3765,

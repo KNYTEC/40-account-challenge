@@ -6,7 +6,7 @@ trading challenge (and anything else built later).
 Public, manually updated P&L tracker for the MNQDegen 40 Account Challenge:
 one trader running 40 prop firm evaluations in parallel, copying the same
 trades to every account, with hard daily lockouts (+$250 win / −$100 loss
-per account, per day). The mission: **35 winning days → $100K in payouts**,
+per account, per day). The mission: **34 winning days → $100K in payouts**,
 degenerate with discipline.
 
 **There is no API and no backend.** The daily result is entered by hand into
