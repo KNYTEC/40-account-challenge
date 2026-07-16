@@ -16,6 +16,7 @@
   "baselineDailyPace": 250,
   "milestones": {
     "evalPassPerAccount": 3000,
+    "bufferPerAccount": 2000,
     "fundedProfitForPayout": 4000,
     "withdrawalPerAccount": 1500,
     "payout2PerAccount": 1000,

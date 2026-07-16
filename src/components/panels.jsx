@@ -115,7 +115,7 @@ export function Milestones({ milestones, stats }) {
         <div className="milestone" key={m.key}>
           <div className="row">
             <p className="name">
-              {m.title} {m.locked && <span className="locked-tag">· locked until eval passes</span>}
+              {m.title} {m.locked && <span className="locked-tag">· unlocks after the step above</span>}
             </p>
             <span className={`eta ${m.done ? 'done' : ''}`}>
               {m.done ? '✓ Reached' : m.locked ? '' : `est. ${m.etaDays} trading day${m.etaDays === 1 ? '' : 's'} left`}

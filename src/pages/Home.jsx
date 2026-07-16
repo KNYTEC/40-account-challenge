@@ -238,7 +238,7 @@ export default function Home({ stats, milestones, callout, config }) {
       <Reveal>
       <section className="section">
         <p className="section-eyebrow">The roadmap</p>
-        <h2 className="section-title">Three checkpoints to {money(countdown.withdrawalTotal)} in payouts.</h2>
+        <h2 className="section-title">Five checkpoints to {money(countdown.withdrawalTotal)} in payouts.</h2>
         <Milestones milestones={milestones} stats={stats} />
       </section>
       </Reveal>

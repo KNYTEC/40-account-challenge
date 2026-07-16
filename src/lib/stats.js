@@ -89,13 +89,25 @@ export function computeMilestones(stats, config) {
   const etaDays = (remaining) =>
     remaining <= 0 ? 0 : Math.ceil(remaining / stats.pace)
 
+  const bufferTarget = evalTarget + (milestones.bufferPerAccount || 0) // $5,000/acct
   const evalPct = clamp01(cum / evalTarget)
   const fundedProgress = Math.max(0, cum - evalTarget)
+  const bufferPct = clamp01(fundedProgress / (milestones.bufferPerAccount || 1))
   const payout1Pct = clamp01(fundedProgress / milestones.fundedProfitForPayout)
   const payout2Span = payout2Target - payout1Target
   const payout2Pct = clamp01((cum - payout1Target) / payout2Span)
 
   return [
+    {
+      key: 'start',
+      title: 'Evals purchased — challenge started',
+      subtitle: `${accounts} × $50K evaluations across 5 firms — ${moneyish(investmentTotal(config))} deployed`,
+      pct: 1,
+      done: true,
+      locked: false,
+      valueText: `${moneyish(investmentTotal(config))} in · ${accounts} accounts live`,
+      etaDays: 0,
+    },
     {
       key: 'eval',
       title: 'Pass evaluation',
@@ -107,12 +119,22 @@ export function computeMilestones(stats, config) {
       etaDays: etaDays(evalTarget - cum),
     },
     {
+      key: 'buffer',
+      title: 'Buffer built',
+      subtitle: `${moneyish(milestones.bufferPerAccount)} cushion per funded account`,
+      pct: bufferPct,
+      done: cum >= bufferTarget,
+      locked: cum < evalTarget,
+      valueText: `${moneyish(Math.min(fundedProgress, milestones.bufferPerAccount))} of ${moneyish(milestones.bufferPerAccount)} buffer`,
+      etaDays: etaDays(bufferTarget - cum),
+    },
+    {
       key: 'payout1',
       title: 'First payout',
       subtitle: `${moneyish(milestones.withdrawalPerAccount)} × ${accounts} accounts = ${moneyish(payout1Total)}`,
       pct: payout1Pct,
       done: cum >= payout1Target,
-      locked: cum < evalTarget,
+      locked: cum < bufferTarget,
       valueText: `${moneyish(Math.round(payout1Pct * payout1Total))} of ${moneyish(payout1Total)} unlocked`,
       etaDays: etaDays(payout1Target - cum),
     },
