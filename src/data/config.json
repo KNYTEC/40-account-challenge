@@ -1,6 +1,6 @@
 {
   "challengeName": "40 Account Challenge",
-  "tagline": "36 winning days. $130K in payouts.",
+  "tagline": "33 winning days. $116K in payouts.",
   "series": "MNQDegen",
   "brand": "MNQDegen",
   "handle": "@mnqdegen",
@@ -17,7 +17,8 @@
   "milestones": {
     "evalPassPerAccount": 3000,
     "bufferPerAccount": 2000,
-    "fundedProfitForPayout": 4000
+    "fundedProfitForPayout": 4000,
+    "payout2WinningDays": 5
   },
   "investment": {
     "total": 3765,
@@ -31,28 +32,34 @@
         "accountType": "$50K · No activation fee",
         "accounts": 5,
         "costPerAccount": 85,
-        "payout": { "maxWithdraw": 2000, "traderShare": 0.9, "note": "50% of profits at $4K · 90/10 split" }
+        "payout": { "maxWithdraw": 2000, "pctOfProfits": 0.5, "traderShare": 0.9, "note": "50% of profits · 90/10 split" }
       },
       {
         "firm": "MyFundedFutures",
         "accountType": "$50K · Flex Plan",
         "accounts": 5,
         "costPerAccount": 80,
-        "payout": { "maxWithdraw": 2000, "traderShare": 0.8, "note": "50% of profits, max $2,000 · 80/20 split" }
+        "payout": { "maxWithdraw": 2000, "pctOfProfits": 0.5, "traderShare": 0.8, "note": "50% of profits, max $2,000 · 80/20 split" }
       },
       {
         "firm": "Tradeify",
         "accountType": "$50K · Select",
         "accounts": 5,
         "costPerAccount": 94,
-        "payout": { "maxWithdraw": 2000, "traderShare": 0.9, "note": "50% of profits, max $3,000 · 90/10 split" }
+        "payout": {
+          "maxWithdraw": 3000,
+          "pctOfProfits": 0.5,
+          "traderShare": 0.9,
+          "cycle2": false,
+          "note": "50% of profits, max $3,000 · 90/10 split · moves to Elite Live after 1st payout"
+        }
       },
       {
         "firm": "Lucid",
         "accountType": "$50K · Flex",
         "accounts": 5,
         "costPerAccount": 98,
-        "payout": { "maxWithdraw": 2000, "traderShare": 0.9, "note": "50% of profits, max $2,000 · 90/10 split" }
+        "payout": { "maxWithdraw": 2000, "pctOfProfits": 0.5, "traderShare": 0.9, "note": "50% of profits, max $2,000 · 90/10 split" }
       },
       {
         "firm": "Apex",

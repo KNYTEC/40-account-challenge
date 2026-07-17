@@ -74,8 +74,8 @@ export default function StakePage({ stats, config }) {
                   <td className="num">{totalAccounts}</td>
                   <td className="num" />
                   <td className="num">{money(total)}</td>
-                  <td className="note-cell">per payout cycle, after splits</td>
-                  <td className="num">{money(model.perCycle)}</td>
+                  <td className="note-cell">first payout cycle, after splits</td>
+                  <td className="num">{money(model.cycle1)}</td>
                 </tr>
               </tbody>
             </table>
@@ -98,11 +98,13 @@ export default function StakePage({ stats, config }) {
                 </tr>
                 <tr>
                   <td className="muted-cell">Payout #1 target (real firm rules, after splits)</td>
-                  <td>{money(model.perCycle)}</td>
+                  <td>{money(model.cycle1)}</td>
                 </tr>
                 <tr>
-                  <td className="muted-cell">Payout #2 target (same rules, after rebuild)</td>
-                  <td>{money(model.perCycle)}</td>
+                  <td className="muted-cell">
+                    Payout #2 target ({model.rebuildDays} winning days later · Tradeify → live, excluded)
+                  </td>
+                  <td>{money(model.cycle2)}</td>
                 </tr>
                 <tr>
                   <td className="muted-cell">Withdrawn to date</td>

@@ -84,11 +84,10 @@ export function computeMilestones(stats, config) {
   const evalTarget = milestones.evalPassPerAccount
   const model = computePayoutModel(config)
   const payout1Target = evalTarget + milestones.fundedProfitForPayout // $7,000/acct
-  // Payout #1 withdraws each firm's max at the $4,000 gate; payout #2 fires
-  // when the slowest accounts have rebuilt to the same gate.
-  const payout2Target = payout1Target + model.maxRebuild // $9,000/acct
-  const payout1Total = model.perCycle // $65,000 to the trader
-  const payout2Total = model.total // $130,000 across both cycles
+  // Payout #2 fires after the minimum eligible wait: 5 winning days.
+  const payout2Target = payout1Target + model.rebuildAmount // $8,250/acct
+  const payout1Total = model.cycle1 // $65,000 to the trader
+  const payout2Total = model.total // $116,125 across both cycles
   const etaDays = (remaining) =>
     remaining <= 0 ? 0 : Math.ceil(remaining / stats.pace)
 
@@ -144,7 +143,7 @@ export function computeMilestones(stats, config) {
     {
       key: 'payout2',
       title: 'Second payout',
-      subtitle: `rebuild to the ${moneyish(milestones.fundedProfitForPayout)} gate · +${moneyish(model.perCycle)} → ${moneyish(payout2Total)} total`,
+      subtitle: `${model.rebuildDays} winning days after payout #1 · +${moneyish(model.cycle2)} → ${moneyish(payout2Total)} total (Tradeify → live)`,
       pct: payout2Pct,
       done: cum >= payout2Target,
       locked: cum < payout1Target,
@@ -163,31 +162,47 @@ export function investmentTotal(config) {
     : config.investment.total
 }
 
-// Real payout economics, derived from each firm's actual rules (config
-// firms[].payout). At the $4K-profit gate every account withdraws its firm's
-// max; the trader receives their share after the firm's split.
-// - perCycle: what lands in the trader's pocket per payout cycle
-// - maxRebuild: the largest per-account withdrawal — the wall moves together,
-//   so payout #2 waits for the slowest accounts to rebuild to the $4K gate
+// Real payout economics, simulated per firm from actual rules (config
+// firms[].payout: pctOfProfits, maxWithdraw cap, traderShare split).
+//
+// Cycle 1: every account requests at the $4,000-profit gate.
+// Cycle 2: the minimum eligible wait — payout2WinningDays winning days after
+// payout #1 — with each firm's rule applied to its actual remaining balance.
+// Tradeify (cycle2: false) moves to Elite Live after its first payout, so its
+// accounts are excluded from cycle 2.
 export function computePayoutModel(config) {
   const firms = config.investment.firms || []
-  let perCycle = 0
-  let maxRebuild = 0
+  const win = config.rules.dailyWinLockout
+  const gate = config.milestones.fundedProfitForPayout // $4,000
+  const rebuildDays = config.milestones.payout2WinningDays || 5
+  const rebuild = rebuildDays * win // $1,250
+
+  let cycle1 = 0
+  let cycle2 = 0
   for (const f of firms) {
-    const w = f.payout?.maxWithdraw ?? 0
-    perCycle += f.accounts * w * (f.payout?.traderShare ?? 1)
-    maxRebuild = Math.max(maxRebuild, w)
+    const p = f.payout
+    if (!p) continue
+    const share = p.traderShare ?? 1
+    // cycle 1: withdraw at the $4K gate, limited by pct-of-profits and cap
+    const w1 = Math.min(p.maxWithdraw, p.pctOfProfits ? p.pctOfProfits * gate : p.maxWithdraw)
+    cycle1 += f.accounts * w1 * share
+    // cycle 2: 5 winning days later, on the post-withdrawal balance
+    if (p.cycle2 === false) continue
+    const balance2 = gate - w1 + rebuild
+    const w2 = Math.min(p.maxWithdraw, p.pctOfProfits ? p.pctOfProfits * balance2 : p.maxWithdraw, balance2)
+    cycle2 += f.accounts * w2 * share
   }
   return {
-    perCycle, // $65,000
-    total: perCycle * 2, // $130,000 across two cycles
-    maxRebuild, // $2,000
-    rebuildDays: Math.ceil(maxRebuild / config.rules.dailyWinLockout), // 8
+    cycle1, // $65,000
+    cycle2, // $51,125
+    total: cycle1 + cycle2, // $116,125
+    rebuildDays, // 5
+    rebuildAmount: rebuild, // $1,250 per account
   }
 }
 
 // The big motivational countdown: how many winning days (green days at the
-// +$250 daily max) still stand between today and the FULL $130K in payouts.
+// +$250 daily max) still stand between today and the FULL payout target.
 // Assumes every next day is a win. Recomputes from cumulative P&L, so every
 // new day moves it. Payout #1 ($65K) is a marker along the way.
 export function computeCountdown(stats, config) {
@@ -197,9 +212,8 @@ export function computeCountdown(stats, config) {
 
   const model = computePayoutModel(config)
   const payout1TargetPerAccount = milestones.evalPassPerAccount + milestones.fundedProfitForPayout // $7,000
-  // after each firm's max withdrawal, the slowest accounts rebuild $2,000
-  // back to the same $4,000 gate
-  const payout2TargetPerAccount = payout1TargetPerAccount + model.maxRebuild // $9,000
+  // payout #2 at the minimum eligible wait: 5 more winning days
+  const payout2TargetPerAccount = payout1TargetPerAccount + model.rebuildAmount // $8,250
 
   const remaining = payout2TargetPerAccount - cum
   const winningDays = remaining <= 0 ? 0 : Math.ceil(remaining / winAmount)
@@ -207,8 +221,8 @@ export function computeCountdown(stats, config) {
   const bankedWinningDays = Math.max(0, Math.min(totalWinningDays, Math.round(cum / winAmount)))
   const progressPct = clamp01(cum / payout2TargetPerAccount)
 
-  const payout1Total = model.perCycle // $65,000 to the trader
-  const payout2Total = model.total // $130,000 across both cycles
+  const payout1Total = model.cycle1 // $65,000 to the trader
+  const payout2Total = model.total // $116,125 across both cycles
   const payout1RemainingPerAccount = Math.max(0, payout1TargetPerAccount - cum)
   const payout1WinningDaysLeft =
     payout1RemainingPerAccount <= 0 ? 0 : Math.ceil(payout1RemainingPerAccount / winAmount)
@@ -220,12 +234,12 @@ export function computeCountdown(stats, config) {
 
   return {
     unlocked: remaining <= 0,
-    winningDays, // to the full $130K
+    winningDays, // to the full payout target
     winAmount,
     totalWinningDays, // 35
     bankedWinningDays,
     progressPct,
-    withdrawalTotal: payout2Total, // full $130K
+    withdrawalTotal: payout2Total, // full payout target ($116,125)
     remainingPerAccount: Math.max(0, remaining),
     movedToday,
     evalPassed: cum >= milestones.evalPassPerAccount,

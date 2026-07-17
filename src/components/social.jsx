@@ -47,7 +47,7 @@ const SOCIALS = [
     Icon: YouTubeIcon,
     bg: '#e01e2f',
     fg: '#fff',
-    desc: 'The road to $130K in payouts — every lockout on camera',
+    desc: 'The road to $116K in payouts — every lockout on camera',
     short: 'long-form recaps',
   },
   {
