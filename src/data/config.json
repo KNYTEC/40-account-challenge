@@ -8,6 +8,7 @@
   "avatar": "/mnqdegen.jpg",
   "copyTrader": "Tradesyncer",
   "accounts": 40,
+  "challengeStarted": false,
   "rules": {
     "dailyWinLockout": 250,
     "dailyLossLockout": -100,

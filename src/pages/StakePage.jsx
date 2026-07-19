@@ -35,7 +35,7 @@ export default function StakePage({ stats, config }) {
         )}
 
         <div className="card">
-          <h2>Where the {money(total)} went</h2>
+          <h2>Where the {money(total)} {config.challengeStarted ? 'went' : 'goes'}</h2>
           <p className="card-sub">
             {investment.breakdownFinal
               ? 'Exact eval costs, firm by firm.'

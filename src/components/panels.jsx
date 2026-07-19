@@ -118,7 +118,13 @@ export function Milestones({ milestones, stats }) {
               {m.title} {m.locked && <span className="locked-tag">· unlocks after the step above</span>}
             </p>
             <span className={`eta ${m.done ? 'done' : ''}`}>
-              {m.done ? '✓ Reached' : m.locked ? '' : `est. ${m.etaDays} trading day${m.etaDays === 1 ? '' : 's'} left`}
+              {m.done
+                ? '✓ Reached'
+                : m.etaText
+                  ? m.etaText
+                  : m.locked
+                    ? ''
+                    : `est. ${m.etaDays} trading day${m.etaDays === 1 ? '' : 's'} left`}
             </span>
           </div>
           <p className="target">{m.subtitle}</p>

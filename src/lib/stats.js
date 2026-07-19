@@ -99,16 +99,21 @@ export function computeMilestones(stats, config) {
   const payout2Span = payout2Target - payout1Target
   const payout2Pct = clamp01((cum - payout1Target) / payout2Span)
 
+  const started = config.challengeStarted === true
+
   return [
     {
       key: 'start',
-      title: 'Evals purchased — challenge started',
-      subtitle: `${accounts} × $50K evaluations across 5 firms — ${moneyish(investmentTotal(config))} deployed`,
-      pct: 1,
-      done: true,
+      title: started ? 'Evals purchased — challenge started' : 'Evals purchased — challenge start',
+      subtitle: `${accounts} × $50K evaluations across 5 firms — ${moneyish(investmentTotal(config))} ${started ? 'deployed' : 'to deploy'}`,
+      pct: started ? 1 : 0,
+      done: started,
       locked: false,
-      valueText: `${moneyish(investmentTotal(config))} in · ${accounts} accounts live`,
+      valueText: started
+        ? `${moneyish(investmentTotal(config))} in · ${accounts} accounts live`
+        : `0 of ${accounts} accounts live`,
       etaDays: 0,
+      etaText: started ? undefined : 'up next',
     },
     {
       key: 'eval',
@@ -116,7 +121,7 @@ export function computeMilestones(stats, config) {
       subtitle: `${moneyish(evalTarget)} profit per account`,
       pct: evalPct,
       done: cum >= evalTarget,
-      locked: false,
+      locked: !started,
       valueText: `${moneyish(Math.max(0, Math.min(cum, evalTarget)))} of ${moneyish(evalTarget)}`,
       etaDays: etaDays(evalTarget - cum),
     },
